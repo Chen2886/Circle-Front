@@ -1,13 +1,18 @@
 import "./App.css";
+import Login from "./Login.js";
+import Main from "./Main.js";
 import React from "react";
-import Grid from "@material-ui/core/Grid";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+  Grid,
+  InputBase,
+  AppBar,
+  Button,
+  Toolbar,
+  IconButton,
+  Typography,
+} from "@material-ui/core";
 import { fade, makeStyles } from "@material-ui/core/styles";
-import InputBase from "@material-ui/core/InputBase";
-import AppBar from "@material-ui/core/AppBar";
-import Button from "@material-ui/core/Button";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -74,59 +79,94 @@ const theme = createMuiTheme({
   },
 });
 
-export default function PrimarySearchAppBar() {
+export default function App(props) {
   const classes = useStyles();
+  const [showSearchField, setShowSearchField] = React.useState(true);
+
   return (
     <MuiThemeProvider theme={theme}>
-      <div className={classes.grow}>
-        <Helmet>
-          <title>Home</title>
-          <style>{"body { background-color: black; }"}</style>
-        </Helmet>
-        <div className={classes.root}>
-          <AppBar position="static" className={classes.appBar}>
-            <Toolbar>
-              <Grid justify="space-between" container alignItems="center" direction="row">
-                <Grid xs={2} container alignItems="center" direction="row">
-                  <IconButton
-                    edge="start"
-                    className={classes.menuButton}
-                    color="inherit"
-                    aria-label="menu"
-                  >
-                    <MenuIcon />
-                  </IconButton>
-                  <Typography variant="h6" className={classes.title}>
-                    Circle
-                  </Typography>
-                </Grid>
-                <Grid xs={2} item></Grid>
-                <Grid xs={4} item>
-                  <div className={classes.search}>
-                    <div className={classes.searchIcon}>
-                      <SearchIcon />
+      <Router>
+        <div className={classes.grow}>
+          <Helmet>
+            <title>Home</title>
+            <style>{"body { background-color: black; }"}</style>
+          </Helmet>
+          <div className={classes.root}>
+            <AppBar position="static" className={classes.appBar}>
+              <Toolbar>
+                <Grid
+                  justify="space-between"
+                  container
+                  alignItems="center"
+                  direction="row"
+                >
+                  <Grid xs={2} item align="left">
+                    <table>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <IconButton
+                              edge="start"
+                              className={classes.menuButton}
+                              color="inherit"
+                              aria-label="menu"
+                            >
+                              <MenuIcon />
+                            </IconButton>
+                          </td>
+                          <td>
+                            <Typography variant="h6" className={classes.title}>
+                              Circle
+                            </Typography>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </Grid>
+                  <Grid xs={2} item></Grid>
+                  <Grid xs={4} item>
+                    {showSearchField && (
+                      <div className={classes.search}>
+                        <div className={classes.searchIcon}>
+                          <SearchIcon />
+                        </div>
+                        <InputBase
+                          placeholder="Search…"
+                          classes={{
+                            root: classes.inputRoot,
+                            input: classes.inputInput,
+                          }}
+                          inputProps={{ "aria-label": "search" }}
+                        />
+                      </div>
+                    )}
+                  </Grid>
+                  <Grid xs={3} item></Grid>
+                  <Grid xs={1} item>
+                    <div align="right">
+                      <Button color="inherit" component={Link} to="/login">
+                        Login
+                      </Button>
                     </div>
-                    <InputBase
-                      placeholder="Search…"
-                      classes={{
-                        root: classes.inputRoot,
-                        input: classes.inputInput,
-                      }}
-                      inputProps={{ "aria-label": "search" }}
-                    />
-                  </div>
+                  </Grid>
                 </Grid>
-                <Grid xs={3} item></Grid>
-                <Grid xs={1} item>
-                  <div align="right">
-                    <Button color="inherit">Login</Button>
-                  </div>
-                </Grid>
-              </Grid>
-            </Toolbar>
-          </AppBar>
+              </Toolbar>
+            </AppBar>
+          </div>
         </div>
-      </div>
+        <Switch>
+          <Route
+            exact
+            path="/login"
+            component={() => <Login setShowSearchField={setShowSearchField} />}
+          />
+          <Route
+            exact
+            path="/"
+            component={() => <Main setShowSearchField={setShowSearchField} />}
+          />
+        </Switch>
+      </Router>
     </MuiThemeProvider>
   );
 }
