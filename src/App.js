@@ -25,8 +25,17 @@ const useStyles = makeStyles((theme) => ({
   menuButton: {
     marginRight: theme.spacing(2),
   },
+  link: {
+    textDecoration: 'none',
+  },
   title: {
     flexGrow: 1,
+    color: 'white',
+    textDecoration: 'none',
+    "&:hover": {
+      color: "lightgray",
+      cursor: "pointer",
+    },
   },
   appBar: {
     backgroundColor: "#528487",
@@ -89,7 +98,7 @@ export default function App(props) {
         <div className={classes.grow}>
           <Helmet>
             <title>Home</title>
-            <style>{"body { background-color: black; }"}</style>
+            <style>{"body { background-color: grey; }"}</style>
           </Helmet>
           <div className={classes.root}>
             <AppBar position="static" className={classes.appBar}>
@@ -115,9 +124,14 @@ export default function App(props) {
                             </IconButton>
                           </td>
                           <td>
-                            <Typography variant="h6" className={classes.title}>
-                              Circle
-                            </Typography>
+                            <Link to="/" className={classes.link}>
+                              <Typography
+                                variant="h5"
+                                className={classes.title}
+                              >
+                                CIRCLE
+                              </Typography>
+                            </Link>
                           </td>
                         </tr>
                       </tbody>
