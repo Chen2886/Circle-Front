@@ -6,6 +6,7 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
+  Typography,
 } from "@material-ui/core";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
@@ -37,13 +38,23 @@ const useStyles = makeStyles((theme) => ({
   checkBox: {
     float: "left",
     marginLeft: "3px",
-  }
+  },
+  checkBoxLabel: {
+    fontFamily: font,
+  },
+  button: {
+    float: "right",
+    fontFamily: font,
+  },
+  textFieldRoot: {
+    fontFamily: font,
+  },
 }));
 
 const font = "'Tenor Sans', sans-serif";
 
 const theme = createMuiTheme({
-  Typography: {
+  FormControlLabel: {
     fontFamily: font,
   },
 });
@@ -93,6 +104,11 @@ export default function Login(props) {
                 </InputAdornment>
               ),
             }}
+            InputLabelProps={{
+              classes: {
+                root: classes.textFieldRoot,
+              }
+            }}
           />
         </div>
         <div className={classes.container}>
@@ -111,6 +127,11 @@ export default function Login(props) {
                 </InputAdornment>
               ),
             }}
+            InputLabelProps={{
+              classes: {
+                root: classes.textFieldRoot,
+              }
+            }}
           />
         </div>
         <div className={classes.container}>
@@ -123,7 +144,11 @@ export default function Login(props) {
                 onChange={changeRememberMe}
               />
             }
-            label="Remember Me?"
+            label={
+              <Typography className={classes.checkBoxLabel}>
+                Remember Me?
+              </Typography>
+            }
             className={classes.checkBox}
           />
           <Button
@@ -132,7 +157,7 @@ export default function Login(props) {
             onClick={() =>
               login(username, password, rememberMe, setMissingRequired)
             }
-            style={{ float: "right" }}
+            className={classes.button}
           >
             LOGIN
           </Button>
