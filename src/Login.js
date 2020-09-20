@@ -1,73 +1,14 @@
 import "./App.css";
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import Grid from "@material-ui/core/Grid";
-import { fade, makeStyles } from "@material-ui/core/styles";
-import InputBase from "@material-ui/core/InputBase";
-import AppBar from "@material-ui/core/AppBar";
-import Button from "@material-ui/core/Button";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
+import { InputAdornment, TextField, Button } from "@material-ui/core";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
-import SearchIcon from "@material-ui/icons/Search";
-import MenuIcon from "@material-ui/icons/Menu";
-import Helmet from "react-helmet";
+import { fade, makeStyles } from "@material-ui/core/styles";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import EmailIcon from "@material-ui/icons/Email";
+import LockIcon from "@material-ui/icons/Lock";
+import Alert from "@material-ui/lab/Alert";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  title: {
-    flexGrow: 1,
-  },
-  appBar: {
-    backgroundColor: "#528487",
-  },
-  search: {
-    position: "relative",
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
-    "&:hover": {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
-    },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      marginLeft: theme.spacing(3),
-      width: "auto",
-    },
-  },
-  searchIcon: {
-    padding: theme.spacing(0, 2),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  inputRoot: {
-    color: "inherit",
-  },
-  inputInput: {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "30ch",
-    },
-    alignContent: "center",
-  },
-}));
-
-const font = "'Tenor Sans', sans-serif";
+const font = '"Tenor Sans", sans-serif';
 
 const theme = createMuiTheme({
   typography: {
@@ -75,9 +16,93 @@ const theme = createMuiTheme({
   },
 });
 
+const useStyles = makeStyles((theme) => ({
+  container: {
+    textAlign: "center",
+    paddingBottom: "20px",
+  },
+  first: {
+    textAlign: "center",
+    paddingBottom: "20px",
+    marginTop: "50px",
+  },
+  button: {
+    // width: "20%",
+  },
+  width: {
+    width: "20%",
+  },
+}));
+
+function login(username, password, setMissingRequired) {
+  if (username === '' || password === '') setMissingRequired(true);
+}
+
 export default function Login(props) {
+  // turn off search field for login page
   props.setShowSearchField(false);
+
+  // styles
+  const classes = useStyles();
+
+  // hooks
+  const [password, setPassword] = React.useState("");
+  const [username, setUsername] = React.useState("");
+  const [missingRequired, setMissingRequired] = React.useState(false);
+
+  const passwordChanged = (e) => setPassword(e.target.value);
+  const usernameChanged = (e) => setUsername(e.target.value);
+
   return (
-    <p>Login</p>
+    <>
+      <form>
+        <div className={classes.first}>
+          <TextField
+            required
+            id="username"
+            label="Username"
+            className={classes.width}
+            variant="outlined"
+            onChange={usernameChanged}
+            error={missingRequired && username === ''}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircleIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
+        <div className={classes.container}>
+          <TextField
+            required
+            id="password"
+            label="Password"
+            className={classes.width}
+            variant="outlined"
+            onChange={passwordChanged}
+            error={missingRequired && password === ''}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
+        <div className={classes.container}>
+          <Button
+            className={classes.button}
+            variant="outlined"
+            color="primary"
+            onClick={() => login(username, password, setMissingRequired)}
+          >
+            LOGIN
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }

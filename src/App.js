@@ -98,7 +98,7 @@ export default function App(props) {
         <div className={classes.grow}>
           <Helmet>
             <title>Home</title>
-            <style>{"body { background-color: grey; }"}</style>
+            {/* <style>{"body { background-color: lightgray; }"}</style> */}
           </Helmet>
           <div className={classes.root}>
             <AppBar position="static" className={classes.appBar}>
