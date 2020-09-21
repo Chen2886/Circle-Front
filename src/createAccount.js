@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
-import { InputAdornment, TextField, Button, Checkbox, FormControlLabel, Typography, Container } from '@material-ui/core';
-import { Redirect, Link } from 'react-router-dom';
+import { InputAdornment, TextField, Button, Container } from '@material-ui/core';
+import { Redirect } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -89,9 +89,20 @@ const theme = createMuiTheme({
   },
 });
 
-function createAccount(username, password, email, setMissingRequired, setRedirectToHome, passwordLength, passwordLower, passwordUpper) {
+function createAccount(
+  username,
+  password,
+  retypePassword,
+  email,
+  setMissingRequired,
+  setRedirectToHome,
+  passwordLength,
+  passwordLower,
+  passwordUpper
+) {
   // TODO: call api
   if (passwordLength || passwordLower || passwordUpper) return;
+  if (password !== retypePassword) return;
   if (username === '' || password === '' || email === '') setMissingRequired(true);
   else {
     setRedirectToHome(true);
@@ -267,11 +278,31 @@ export default function Login(props) {
           />
         </div>
         <div className={classes.container}>
+          {password.length > 0 && (
+            <div className={password === retypePassword ? classes.requirementListPass : classes.requirementListFail}>
+              {password === retypePassword && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
+              {password !== retypePassword && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
+              {password === retypePassword && 'Password match.'}
+              {password !== retypePassword && 'Password do not match.'}
+            </div>
+          )}
+        </div>
+        <div className={classes.container}>
           <Button
             variant='outlined'
             color='primary'
             onClick={() =>
-              createAccount(username, password, email, setMissingRequired, setRedirectToHome, passwordLength, passwordLower, passwordUpper)
+              createAccount(
+                username,
+                password,
+                retypePassword,
+                email,
+                setMissingRequired,
+                setRedirectToHome,
+                passwordLength,
+                passwordLower,
+                passwordUpper
+              )
             }
             classes={{
               root: classes.button,
