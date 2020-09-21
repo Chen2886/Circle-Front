@@ -103,7 +103,7 @@ export default function Login(props) {
       {redirectToHome && <Redirect push to='/' />}
       <Container maxWidth='sm'>
         <div className={classes.first}>
-          <img src={logo} className={classes.pic} alt='logo' />
+          <img src={logo} className={classes.pic} alt='logo' style={{ width: '20%' }} />
         </div>
         <div className={classes.container}>
           <TextField
@@ -190,7 +190,7 @@ export default function Login(props) {
         </div>
         <div className={classes.container}>
           <Link to='/createAccount' className={classes.forgotPassword}>
-            <div>New to Circle? Create Account</div>
+            <div>New to CIRCLE? Create Account</div>
           </Link>
         </div>
       </Container>

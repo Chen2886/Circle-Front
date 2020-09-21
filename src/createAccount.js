@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
     display: 'block',
     marginLeft: 'auto',
     marginRight: 'auto',
-    width: '90%',
+    width: '80%',
   },
   checkBox: {
     float: 'left',
@@ -154,7 +154,7 @@ export default function Login(props) {
       {redirectToHome && <Redirect push to='/' />}
       <Container maxWidth='sm'>
         <div className={classes.first}>
-          <img src={logo} className={classes.pic} alt='logo' />
+          <img src={logo} className={classes.pic} alt='logo' style={{ width: '20%' }} />
         </div>
         <div className={classes.container}>
           <TextField
@@ -239,17 +239,17 @@ export default function Login(props) {
           <div className={passwordLength ? classes.requirementListPass : classes.requirementListFail}>
             {passwordLength && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
             {!passwordLength && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
-            Password must contain at least 8 charaters.
+            Password must contain at least 8 characters.
           </div>
           <div className={passwordLower ? classes.requirementListPass : classes.requirementListFail}>
             {passwordLower && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
             {!passwordLower && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
-            Password must contain at least 1 lowercase charater.
+            Password must contain at least 1 lowercase character.
           </div>
           <div className={passwordUpper ? classes.requirementListPass : classes.requirementListFail}>
             {passwordUpper && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
             {!passwordUpper && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
-            Password must contain at least 1 uppercase charater.
+            Password must contain at least 1 uppercase character.
           </div>
         </div>
         <div className={classes.container}>

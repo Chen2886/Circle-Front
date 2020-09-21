@@ -10,6 +10,7 @@ import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import MenuIcon from '@material-ui/icons/Menu';
 import Helmet from 'react-helmet';
+import logo from './resources/logo.png';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -114,6 +115,9 @@ export default function App(props) {
                                 CIRCLE
                               </Typography>
                             </Link>
+                          </td>
+                          <td>
+                            <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "5px", width: "80%"}} />
                           </td>
                         </tr>
                       </tbody>
