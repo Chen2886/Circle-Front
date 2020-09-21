@@ -1,91 +1,83 @@
-import "./App.css";
-import React from "react";
-import {
-  InputAdornment,
-  TextField,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Typography,
-  Container,
-} from "@material-ui/core";
-import { Redirect, Link } from "react-router-dom";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
-import { makeStyles } from "@material-ui/core/styles";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import EmailIcon from "@material-ui/icons/Email";
-import LockIcon from "@material-ui/icons/Lock";
-import CheckIcon from "@material-ui/icons/Check";
-import CloseIcon from "@material-ui/icons/Close";
-import logo from "./resources/logo.jpg";
+import './App.css';
+import React from 'react';
+import { InputAdornment, TextField, Button, Checkbox, FormControlLabel, Typography, Container } from '@material-ui/core';
+import { Redirect, Link } from 'react-router-dom';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import EmailIcon from '@material-ui/icons/Email';
+import LockIcon from '@material-ui/icons/Lock';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
+import logo from './resources/logo.jpg';
 
 const useStyles = makeStyles(() => ({
   container: {
-    textAlign: "center",
-    alignContent: "center",
-    paddingBottom: "30px",
-    overflow: "auto",
+    textAlign: 'center',
+    alignContent: 'center',
+    paddingBottom: '30px',
+    overflow: 'auto',
   },
   first: {
-    textAlign: "center",
-    paddingBottom: "20px",
-    marginTop: "50px",
+    textAlign: 'center',
+    paddingBottom: '20px',
+    marginTop: '50px',
   },
   pic: {
-    alignContent: "center",
-    display: "block",
-    marginLeft: "auto",
-    marginRight: "auto",
-    width: "90%",
+    alignContent: 'center',
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: '90%',
   },
   checkBox: {
-    float: "left",
-    marginLeft: "3px",
+    float: 'left',
+    marginLeft: '3px',
   },
   checkBoxLabel: {
     fontFamily: font,
-    color: "#528487",
+    color: '#528487',
   },
   buttonLabel: {
-    float: "right",
+    float: 'right',
     fontFamily: font,
-    color: "#528487",
+    color: '#528487',
   },
   button: {
-    borderColor: "#528487",
-    float: "right",
+    borderColor: '#528487',
+    float: 'right',
   },
   textFieldRoot: {
     fontFamily: font,
-    color: "#528487",
+    color: '#528487',
   },
   forgotPassword: {
     fontFamily: font,
-    textDecoration: "none",
-    "&:hover": {
-      cursor: "pointer",
-      textDecoration: "underline",
+    textDecoration: 'none',
+    '&:hover': {
+      cursor: 'pointer',
+      textDecoration: 'underline',
     },
   },
   textField: {
     // so it doesn't cut off label
-    marginTop: "5px",
+    marginTop: '5px',
   },
   requirementListPass: {
-    paddingTop: "5px",
-    paddingBottom: "5px",
-    display: "flex",
-    color: "green",
+    paddingTop: '5px',
+    paddingBottom: '5px',
+    display: 'flex',
+    color: 'green',
   },
   requirementListFail: {
-    paddingTop: "5px",
-    paddingBottom: "5px",
-    display: "flex",
-    color: "red",
+    paddingTop: '5px',
+    paddingBottom: '5px',
+    display: 'flex',
+    color: 'red',
   },
   requirementListIcons: {
-    paddingLeft: "5px",
-    paddingRight: "5px",
+    paddingLeft: '5px',
+    paddingRight: '5px',
   },
 }));
 
@@ -97,20 +89,10 @@ const theme = createMuiTheme({
   },
 });
 
-function createAccount(
-  username,
-  password,
-  email,
-  setMissingRequired,
-  setRedirectToHome,
-  passwordLength,
-  passwordLower,
-  passwordUpper
-) {
+function createAccount(username, password, email, setMissingRequired, setRedirectToHome, passwordLength, passwordLower, passwordUpper) {
   // TODO: call api
   if (passwordLength || passwordLower || passwordUpper) return;
-  if (username === "" || password === "" || email === "")
-    setMissingRequired(true);
+  if (username === '' || password === '' || email === '') setMissingRequired(true);
   else {
     setRedirectToHome(true);
     console.log(email);
@@ -125,10 +107,10 @@ export default function Login(props) {
   const classes = useStyles();
 
   // hooks
-  const [password, setPassword] = React.useState("");
-  const [retypePassword, setRetypePassword] = React.useState("");
-  const [username, setUsername] = React.useState("");
-  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState('');
+  const [retypePassword, setRetypePassword] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [email, setEmail] = React.useState('');
   const [missingRequired, setMissingRequired] = React.useState(false);
   const [redirectToHome, setRedirectToHome] = React.useState(false);
 
@@ -158,24 +140,24 @@ export default function Login(props) {
 
   return (
     <MuiThemeProvider theme={theme}>
-      {redirectToHome && <Redirect push to="/" />}
-      <Container maxWidth="sm">
+      {redirectToHome && <Redirect push to='/' />}
+      <Container maxWidth='sm'>
         <div className={classes.first}>
-          <img src={logo} className={classes.pic} alt="logo" />
+          <img src={logo} className={classes.pic} alt='logo' />
         </div>
         <div className={classes.container}>
           <TextField
             required
             fullWidth
-            id="username"
-            label="Username"
-            variant="outlined"
+            id='username'
+            label='Username'
+            variant='outlined'
             onChange={usernameChanged}
-            error={missingRequired && username === ""}
+            error={missingRequired && username === ''}
             className={classes.textField}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment position='start'>
                   <AccountCircleIcon />
                 </InputAdornment>
               ),
@@ -194,15 +176,15 @@ export default function Login(props) {
           <TextField
             required
             fullWidth
-            id="email"
-            label="Email"
-            variant="outlined"
+            id='email'
+            label='Email'
+            variant='outlined'
             onChange={emailChanged}
-            error={missingRequired && email === ""}
+            error={missingRequired && email === ''}
             className={classes.textField}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment position='start'>
                   <EmailIcon />
                 </InputAdornment>
               ),
@@ -221,16 +203,16 @@ export default function Login(props) {
           <TextField
             required
             fullWidth
-            id="password"
-            label="Password"
-            variant="outlined"
-            type="password"
+            id='password'
+            label='Password'
+            variant='outlined'
+            type='password'
             onChange={passwordChanged}
             className={classes.textField}
-            error={missingRequired && password === ""}
+            error={missingRequired && password === ''}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment position='start'>
                   <LockIcon />
                 </InputAdornment>
               ),
@@ -243,49 +225,19 @@ export default function Login(props) {
           />
         </div>
         <div className={classes.container}>
-          <div
-            className={
-              passwordLength
-                ? classes.requirementListPass
-                : classes.requirementListFail
-            }
-          >
-            {passwordLength && (
-              <CheckIcon className={classes.requirementListIcons}></CheckIcon>
-            )}
-            {!passwordLength && (
-              <CloseIcon className={classes.requirementListIcons}></CloseIcon>
-            )}
+          <div className={passwordLength ? classes.requirementListPass : classes.requirementListFail}>
+            {passwordLength && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
+            {!passwordLength && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
             Password must contain at least 8 charaters.
           </div>
-          <div
-            className={
-              passwordLower
-                ? classes.requirementListPass
-                : classes.requirementListFail
-            }
-          >
-            {passwordLower && (
-              <CheckIcon className={classes.requirementListIcons}></CheckIcon>
-            )}
-            {!passwordLower && (
-              <CloseIcon className={classes.requirementListIcons}></CloseIcon>
-            )}
+          <div className={passwordLower ? classes.requirementListPass : classes.requirementListFail}>
+            {passwordLower && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
+            {!passwordLower && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
             Password must contain at least 1 lowercase charater.
           </div>
-          <div
-            className={
-              passwordUpper
-                ? classes.requirementListPass
-                : classes.requirementListFail
-            }
-          >
-            {passwordUpper && (
-              <CheckIcon className={classes.requirementListIcons}></CheckIcon>
-            )}
-            {!passwordUpper && (
-              <CloseIcon className={classes.requirementListIcons}></CloseIcon>
-            )}
+          <div className={passwordUpper ? classes.requirementListPass : classes.requirementListFail}>
+            {passwordUpper && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
+            {!passwordUpper && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
             Password must contain at least 1 uppercase charater.
           </div>
         </div>
@@ -293,16 +245,16 @@ export default function Login(props) {
           <TextField
             required
             fullWidth
-            id="retypePassword"
-            label="Retype Password"
-            variant="outlined"
-            type="password"
+            id='retypePassword'
+            label='Retype Password'
+            variant='outlined'
+            type='password'
             onChange={retypePasswordChanged}
             className={classes.textField}
-            error={missingRequired && password === ""}
+            error={missingRequired && password === ''}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment position='start'>
                   <LockIcon />
                 </InputAdornment>
               ),
@@ -316,25 +268,15 @@ export default function Login(props) {
         </div>
         <div className={classes.container}>
           <Button
-            variant="outlined"
-            color="primary"
+            variant='outlined'
+            color='primary'
             onClick={() =>
-              createAccount(
-                username,
-                password,
-                email,
-                setMissingRequired,
-                setRedirectToHome,
-                passwordLength,
-                passwordLower,
-                passwordUpper
-              )
+              createAccount(username, password, email, setMissingRequired, setRedirectToHome, passwordLength, passwordLower, passwordUpper)
             }
             classes={{
               root: classes.button,
               label: classes.buttonLabel,
-            }}
-          >
+            }}>
             CREATE
           </Button>
         </div>
