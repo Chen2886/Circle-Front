@@ -1,6 +1,7 @@
 import "./App.css";
 import Login from "./Login.js";
 import Main from "./Main.js";
+import CreateAccount from "./createAccount.js"
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import {
@@ -26,12 +27,12 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   link: {
-    textDecoration: 'none',
+    textDecoration: "none",
   },
   title: {
     flexGrow: 1,
-    color: 'white',
-    textDecoration: 'none',
+    color: "white",
+    textDecoration: "none",
     "&:hover": {
       color: "lightgray",
       cursor: "pointer",
@@ -78,6 +79,9 @@ const useStyles = makeStyles((theme) => ({
     },
     alignContent: "center",
   },
+  centerText: {
+    textAlign: "center",
+  },
 }));
 
 const font = "'Tenor Sans', sans-serif";
@@ -98,7 +102,6 @@ export default function App(props) {
         <div className={classes.grow}>
           <Helmet>
             <title>Home</title>
-            {/* <style>{"body { background-color: lightgray; }"}</style> */}
           </Helmet>
           <div className={classes.root}>
             <AppBar position="static" className={classes.appBar}>
@@ -154,6 +157,11 @@ export default function App(props) {
                         />
                       </div>
                     )}
+                    {!showSearchField && (
+                      <Typography className={classes.centerText} variant="h5">
+                        ALWAYS STAY CONNECTED
+                      </Typography>
+                    )}
                   </Grid>
                   <Grid xs={3} item></Grid>
                   <Grid xs={1} item>
@@ -178,6 +186,11 @@ export default function App(props) {
             exact
             path="/"
             component={() => <Main setShowSearchField={setShowSearchField} />}
+          />
+          <Route
+            exact
+            path="/createAccount"
+            component={() => <CreateAccount setShowSearchField={setShowSearchField} />}
           />
         </Switch>
       </Router>

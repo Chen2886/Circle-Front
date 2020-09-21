@@ -7,7 +7,9 @@ import {
   Checkbox,
   FormControlLabel,
   Typography,
+  Container,
 } from "@material-ui/core";
+import { Redirect, Link } from "react-router-dom";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
@@ -17,7 +19,9 @@ import logo from "./resources/logo.jpg";
 const useStyles = makeStyles((theme) => ({
   container: {
     textAlign: "center",
-    paddingBottom: "20px",
+    alignContent: "center",
+    paddingBottom: "30px",
+    overflow: "auto",
   },
   first: {
     textAlign: "center",
@@ -41,14 +45,33 @@ const useStyles = makeStyles((theme) => ({
   },
   checkBoxLabel: {
     fontFamily: font,
+    color: "#528487",
   },
-  button: {
+  buttonLabel: {
     float: "right",
     fontFamily: font,
+    color: "#528487",
+  },
+  button: {
+    borderColor: "#528487",
+    float: "right",
   },
   textFieldRoot: {
     fontFamily: font,
+    color: "#528487",
   },
+  forgotPassword: {
+    fontFamily: font,
+    textDecoration: "none",
+    "&:hover": {
+      cursor: "pointer",
+      textDecoration: "underline",
+    },
+  },
+  textField: {
+    // so it doesn't cut off label
+    marginTop: "5px"
+  }
 }));
 
 const font = "'Tenor Sans', sans-serif";
@@ -59,10 +82,10 @@ const theme = createMuiTheme({
   },
 });
 
-function login(username, password, rememberMe, setMissingRequired) {
+function login(username, password, rememberMe, setMissingRequired, setRedirectToHome) {
   // TODO: call api
-  console.log(rememberMe);
   if (username === "" || password === "") setMissingRequired(true);
+  else setRedirectToHome(true);
 }
 
 export default function Login(props) {
@@ -77,6 +100,7 @@ export default function Login(props) {
   const [username, setUsername] = React.useState("");
   const [missingRequired, setMissingRequired] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(true);
+  const [redirectToHome, setRedirectToHome] = React.useState(false);
 
   const passwordChanged = (e) => setPassword(e.target.value);
   const usernameChanged = (e) => setUsername(e.target.value);
@@ -84,7 +108,8 @@ export default function Login(props) {
 
   return (
     <MuiThemeProvider theme={theme}>
-      <div className={classes.form}>
+      {redirectToHome && <Redirect push to="/" />}
+      <Container maxWidth="sm">
         <div className={classes.first}>
           <img src={logo} className={classes.pic} alt="logo" />
         </div>
@@ -97,17 +122,21 @@ export default function Login(props) {
             variant="outlined"
             onChange={usernameChanged}
             error={missingRequired && username === ""}
+            className={classes.textField}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
                   <AccountCircleIcon />
                 </InputAdornment>
               ),
+              style: {
+                fontFamily: font,
+              },
             }}
             InputLabelProps={{
               classes: {
                 root: classes.textFieldRoot,
-              }
+              },
             }}
           />
         </div>
@@ -118,7 +147,9 @@ export default function Login(props) {
             id="password"
             label="Password"
             variant="outlined"
+            type="password"
             onChange={passwordChanged}
+            className={classes.textField}
             error={missingRequired && password === ""}
             InputProps={{
               startAdornment: (
@@ -130,7 +161,7 @@ export default function Login(props) {
             InputLabelProps={{
               classes: {
                 root: classes.textFieldRoot,
-              }
+              },
             }}
           />
         </div>
@@ -139,9 +170,11 @@ export default function Login(props) {
             control={
               <Checkbox
                 defaultChecked
-                color="primary"
                 name="RememberMe"
                 onChange={changeRememberMe}
+                style={{
+                  color: "#528487"
+                }}
               />
             }
             label={
@@ -155,14 +188,27 @@ export default function Login(props) {
             variant="outlined"
             color="primary"
             onClick={() =>
-              login(username, password, rememberMe, setMissingRequired)
+              login(username, password, rememberMe, setMissingRequired, setRedirectToHome)
             }
-            className={classes.button}
+            classes={{
+              root: classes.button,
+              label: classes.buttonLabel,
+            }}
           >
             LOGIN
           </Button>
         </div>
-      </div>
+        <div className={classes.container}>
+          <Link to="/forgotPassword" className={classes.forgotPassword}>
+            <div>Forgot Password?</div>
+          </Link>
+        </div>
+        <div className={classes.container}>
+          <Link to="/createAccount" className={classes.forgotPassword}>
+            <div>New to Circle? Create Account</div>
+          </Link>
+        </div>
+      </Container>
     </MuiThemeProvider>
   );
 }
