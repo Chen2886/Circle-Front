@@ -74,6 +74,7 @@ const useStyles = makeStyles(() => ({
     paddingBottom: '5px',
     display: 'flex',
     color: 'red',
+    fontFamily: font,
   },
   requirementListIcons: {
     paddingLeft: '5px',
