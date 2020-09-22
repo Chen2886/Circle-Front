@@ -117,7 +117,7 @@ export default function App(props) {
                             </Link>
                           </td>
                           <td>
-                            <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "15px", width: "80%"}} />
+                            <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "15px", width: "40%"}} />
                           </td>
                         </tr>
                       </tbody>
