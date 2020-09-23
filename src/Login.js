@@ -82,8 +82,6 @@ function login(username, password, rememberMe, setMissingRequired, setRedirectTo
   else setRedirectToHome(true);
 }
 
-const handleLoginKeypress = (event) => {};
-
 export default function Login(props) {
   // turn off search field for login page
   props.setShowSearchField(false);
