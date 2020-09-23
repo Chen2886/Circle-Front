@@ -114,6 +114,7 @@ function createAccount(
 export default function Login(props) {
   // turn off search field for login page
   props.setShowSearchField(false);
+  props.setShowLoginButton(false);
 
   // styles
   const classes = useStyles();
