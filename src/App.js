@@ -95,6 +95,7 @@ const theme = createMuiTheme({
 export default function App(props) {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
+  const [showLoginButton, setShowLoginButton] = React.useState(true);
 
   // const img = <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "15px", objectFit: "scale-down"}} />;
 
@@ -157,11 +158,13 @@ export default function App(props) {
                   </Grid>
                   <Grid xs={3} item></Grid>
                   <Grid xs={1} item>
-                    <div align='right'>
-                      <Button color='inherit' component={Link} to='/login'>
-                        Login
-                      </Button>
-                    </div>
+                    {showLoginButton && (
+                      <div align='right'>
+                        <Button color='inherit' component={Link} to='/login'>
+                          Login
+                        </Button>
+                      </div>
+                    )}
                   </Grid>
                 </Grid>
               </Toolbar>
@@ -169,9 +172,13 @@ export default function App(props) {
           </div>
         </div>
         <Switch>
-          <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} />} />
-          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} />} />
-          <Route exact path='/createAccount' component={() => <CreateAccount setShowSearchField={setShowSearchField} />} />
+          <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
+          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
+          <Route
+            exact
+            path='/createAccount'
+            component={() => <CreateAccount setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
+          />
         </Switch>
       </Router>
     </MuiThemeProvider>

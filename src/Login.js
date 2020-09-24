@@ -1,5 +1,5 @@
 import './App.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { InputAdornment, TextField, Button, Checkbox, FormControlLabel, Typography, Container } from '@material-ui/core';
 import { Redirect, Link } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
@@ -76,6 +76,8 @@ const theme = createMuiTheme({
 
 function login(username, password, rememberMe, setMissingRequired, setRedirectToHome) {
   // TODO: call api
+  localStorage.setItem('username', rememberMe && username.length !== 0 ? username : '');
+  localStorage.setItem('rememberMe', rememberMe);
   if (username === '' || password === '') setMissingRequired(true);
   else setRedirectToHome(true);
 }
@@ -83,6 +85,7 @@ function login(username, password, rememberMe, setMissingRequired, setRedirectTo
 export default function Login(props) {
   // turn off search field for login page
   props.setShowSearchField(false);
+  props.setShowLoginButton(false);
 
   // styles
   const classes = useStyles();
@@ -97,6 +100,12 @@ export default function Login(props) {
   const passwordChanged = (e) => setPassword(e.target.value);
   const usernameChanged = (e) => setUsername(e.target.value);
   const changeRememberMe = (e) => setRememberMe(e.target.checked);
+
+  useEffect(() => {
+    if (localStorage.getItem('rememberMe')) {
+      setUsername(localStorage.getItem('username'));
+    }
+  });
 
   return (
     <MuiThemeProvider theme={theme}>
@@ -115,6 +124,7 @@ export default function Login(props) {
             onChange={usernameChanged}
             error={missingRequired && username === ''}
             className={classes.textField}
+            value={username}
             InputProps={{
               startAdornment: (
                 <InputAdornment position='start'>
@@ -143,6 +153,9 @@ export default function Login(props) {
             onChange={passwordChanged}
             className={classes.textField}
             error={missingRequired && password === ''}
+            onKeyPress={(event) => {
+              if (event.key === 'Enter') login(username, password, rememberMe, setMissingRequired, setRedirectToHome);
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position='start'>
