@@ -75,6 +75,13 @@ const useStyles = makeStyles((theme) => ({
   centerText: {
     textAlign: 'center',
   },
+  Toolbar: {
+    maxHeight: '30px',
+  },
+  logo: {
+    marginLeft: '15px',
+    maxHeight: '30px',
+  }
 }));
 
 const font = "'Tenor Sans', sans-serif";
@@ -89,6 +96,8 @@ export default function App(props) {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
 
+  // const img = <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "15px", objectFit: "scale-down"}} />;
+
   return (
     <MuiThemeProvider theme={theme}>
       <Router>
@@ -98,7 +107,7 @@ export default function App(props) {
           </Helmet>
           <div className={classes.root}>
             <AppBar position='static' className={classes.appBar}>
-              <Toolbar>
+              <Toolbar className={classes.Toolbar}>
                 <Grid justify='space-between' container alignItems='center' direction='row'>
                   <Grid xs={2} item align='left'>
                     <table>
@@ -117,7 +126,7 @@ export default function App(props) {
                             </Link>
                           </td>
                           <td>
-                            <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "15px", width: "40%"}} />
+                          <img src={logo} className={classes.pic} alt='logo' className={classes.logo}/>
                           </td>
                         </tr>
                       </tbody>
