@@ -92,6 +92,10 @@ const theme = createMuiTheme({
   },
 });
 
+const handleSearch = (event) => {
+  if (event.key === "Enter") console.log(event.target.value);
+}
+
 export default function App(props) {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
@@ -147,6 +151,7 @@ export default function App(props) {
                             input: classes.inputInput,
                           }}
                           inputProps={{ 'aria-label': 'search' }}
+                          onKeyPress={handleSearch}
                         />
                       </div>
                     )}
