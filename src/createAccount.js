@@ -127,6 +127,7 @@ export default function Login(props) {
   const [missingRequired, setMissingRequired] = React.useState(false);
   const [redirectToHome, setRedirectToHome] = React.useState(false);
 
+  const [emailValid, setEmailValid] = React.useState(false);
   const [passwordLength, setPasswordLength] = React.useState(false);
   const [passwordLower, setPasswordLower] = React.useState(false);
   const [passwordUpper, setPasswordUpper] = React.useState(false);
@@ -148,7 +149,11 @@ export default function Login(props) {
     else setPasswordUpper(false);
   };
   const usernameChanged = (e) => setUsername(e.target.value);
-  const emailChanged = (e) => setEmail(e.target.value);
+  const emailChanged = (e) => {
+    if (/[^@]*@[^.]*\..+/.test(e.target.value)) setEmailValid(true);
+    else setEmailValid(false);
+    setEmail(e.target.value);
+  };
   const retypePasswordChanged = (e) => setRetypePassword(e.target.value);
 
   return (
@@ -211,6 +216,13 @@ export default function Login(props) {
               },
             }}
           />
+        </div>
+        <div className={classes.container}>
+          <div className={emailValid ? classes.requirementListPass : classes.requirementListFail}>
+            {emailValid && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
+            {!emailValid && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
+            Valid Email.
+          </div>
         </div>
         <div className={classes.container}>
           <TextField
