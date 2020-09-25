@@ -1,6 +1,8 @@
 import './App.css';
 import Login from './Login.js';
 import Main from './Main.js';
+import ProfileExample from './ProfileExample.js';
+import Profile from './Profile.js'
 import CreateAccount from './createAccount.js';
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
@@ -9,6 +11,7 @@ import { fade, makeStyles } from '@material-ui/core/styles';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import MenuIcon from '@material-ui/icons/Menu';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import Helmet from 'react-helmet';
 import logo from './resources/logo.png';
 
@@ -85,6 +88,11 @@ const theme = createMuiTheme({
   },
 });
 
+const isUserLoggedIn = () => {
+  // TODO: Ask backend...
+  return true;
+};
+
 export default function App(props) {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
@@ -96,6 +104,7 @@ export default function App(props) {
         <div className={classes.grow}>
           <Helmet>
             <title>Home</title>
+            <style>{'body { background-color: #f8f9fe; }'}</style>
           </Helmet>
           <div className={classes.root}>
             <AppBar position='static' className={classes.appBar}>
@@ -149,11 +158,18 @@ export default function App(props) {
                   </Grid>
                   <Grid xs={3} item></Grid>
                   <Grid xs={1} item>
-                    {showLoginButton && (
+                    {showLoginButton && !isUserLoggedIn() && (
                       <div align='right'>
                         <Button color='inherit' component={Link} to='/login'>
                           Login
                         </Button>
+                      </div>
+                    )}
+                    {showLoginButton && isUserLoggedIn() && (
+                      <div align='right'>
+                        <IconButton color='inherit' component={Link} to='/profile'>
+                          <AccountCircleIcon />
+                        </IconButton>
                       </div>
                     )}
                   </Grid>
@@ -169,6 +185,16 @@ export default function App(props) {
             exact
             path='/createAccount'
             component={() => <CreateAccount setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
+          />
+          <Route
+            exact
+            path='/profile'
+            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
+          />
+          <Route
+            exact
+            path='/profileEx'
+            component={() => <ProfileExample setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
         </Switch>
       </Router>
