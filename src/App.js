@@ -89,6 +89,7 @@ export default function App(props) {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
   const [showLoginButton, setShowLoginButton] = React.useState(true);
+  const [loggedIn, setLoggedIn] = React.useState(false);
 
   return (
     <MuiThemeProvider theme={theme}>
@@ -163,7 +164,7 @@ export default function App(props) {
           </div>
         </div>
         <Switch>
-          <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
+          <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setLoggedIn={setLoggedIn}/>} />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route
             exact

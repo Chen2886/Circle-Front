@@ -74,12 +74,18 @@ const theme = createMuiTheme({
   },
 });
 
-function login(username, password, rememberMe, setMissingRequired, setRedirectToHome) {
+function login(username, password, rememberMe, setMissingRequired, setRedirectToHome, setLoggedIn) {
   // TODO: call api
   localStorage.setItem('username', rememberMe && username.length !== 0 ? username : '');
   localStorage.setItem('rememberMe', rememberMe);
   if (username === '' || password === '') setMissingRequired(true);
-  else setRedirectToHome(true);
+  else goHome(setRedirectToHome, setLoggedIn);
+}
+
+const goHome = (setRedirectToHome, setLoggedIn, setUserInfo) => {
+  // TODO: set user information
+  setLoggedIn(true);
+  setRedirectToHome(true);
 }
 
 export default function Login(props) {
@@ -188,7 +194,7 @@ export default function Login(props) {
           <Button
             variant='outlined'
             color='primary'
-            onClick={() => login(username, password, rememberMe, setMissingRequired, setRedirectToHome)}
+            onClick={() => login(username, password, rememberMe, setMissingRequired, setRedirectToHome, props.setLoggedIn)}
             classes={{
               root: classes.button,
               label: classes.buttonLabel,
