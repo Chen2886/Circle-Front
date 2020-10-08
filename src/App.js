@@ -15,7 +15,6 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
 import Login from './Login.js';
 import Main from './Main.js';
-import ProfileExample from './ProfileExample.js';
 import Profile from './Profile.js';
 import CreateAccount from './createAccount.js';
 import Post from './Post.js';
@@ -249,11 +248,6 @@ export default function App(props) {
             exact
             path='/profile'
             component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
-          />
-          <Route
-            exact
-            path='/profileEx'
-            component={() => <ProfileExample setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
         </Switch>
       </Router>
