@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
+import { Redirect, Link, useHistory } from 'react-router-dom';
 import { Grid, Button, Typography, Card, TextField, Divider, Chip, Avatar } from '@material-ui/core';
 import FaceIcon from '@material-ui/icons/Face';
 import DoneIcon from '@material-ui/icons/Done';
@@ -93,6 +94,13 @@ export default function Main(props) {
   props.setShowSearchField(true);
   props.setShowLoginButton(true);
 
+  const history = useHistory();
+
+  const handleLogout = () => {
+    props.setLoggedIn(false);
+    history.push('/');
+  }
+
   const [bio, setBio] = React.useState('');
 
   const classes = useStyles();
@@ -108,8 +116,8 @@ export default function Main(props) {
             <Typography variant='h4' style={{ float: 'left' }}>
               First Last
             </Typography>
-            <Button variant='outlined' style={{ marginLeft: '2rem' }}>
-              Connect
+            <Button variant='outlined' style={{ marginLeft: '2rem' }} onClick={handleLogout}>
+              Logout
             </Button>
           </div>
           <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>

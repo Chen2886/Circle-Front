@@ -110,11 +110,6 @@ const theme = createMuiTheme({
   },
 });
 
-const isUserLoggedIn = () => {
-  // TODO: Ask backend...
-  return true;
-};
-
 const handleSearch = (event) => {
   if (event.key === 'Enter') console.log(event.target.value);
 };
@@ -209,14 +204,14 @@ export default function App(props) {
                   </Grid>
                   <Grid xs={3} item></Grid>
                   <Grid xs={1} item>
-                    {showLoginButton && !isUserLoggedIn() && (
+                    {showLoginButton && !loggedIn && (
                       <div align='right'>
                         <Button color='inherit' component={Link} to='/login'>
                           Login
                         </Button>
                       </div>
                     )}
-                    {showLoginButton && isUserLoggedIn() && (
+                    {showLoginButton && loggedIn && (
                       <div align='right'>
                         <IconButton color='inherit' component={Link} to='/profile'>
                           <AccountCircleIcon />
@@ -247,7 +242,7 @@ export default function App(props) {
           <Route
             exact
             path='/profile'
-            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
+            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setLoggedIn={setLoggedIn} />}
           />
         </Switch>
       </Router>
