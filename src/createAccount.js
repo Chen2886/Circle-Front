@@ -169,6 +169,7 @@ export default function CreateAccountPage(props) {
   // hook to go back to home
   const [redirectToHome, setRedirectToHome] = React.useState(false);
 
+  const [emailValid, setEmailValid] = React.useState(false);
   // password validation
   const [passwordLength, setPasswordLength] = React.useState(false);
   const [passwordLower, setPasswordLower] = React.useState(false);
@@ -204,7 +205,11 @@ export default function CreateAccountPage(props) {
     setAlertOpen(false);
   };
   const usernameChanged = (e) => setUsername(e.target.value);
-  const emailChanged = (e) => setEmail(e.target.value);
+  const emailChanged = (e) => {
+    if (/[^@]*@[^.]*\..+/.test(e.target.value)) setEmailValid(true);
+    else setEmailValid(false);
+    setEmail(e.target.value);
+  };
   const retypePasswordChanged = (e) => setRetypePassword(e.target.value);
 
   return (
@@ -275,6 +280,13 @@ export default function CreateAccountPage(props) {
               },
             }}
           />
+        </div>
+        <div className={classes.container}>
+          <div className={emailValid ? classes.requirementListPass : classes.requirementListFail}>
+            {emailValid && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
+            {!emailValid && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
+            Valid Email.
+          </div>
         </div>
         <div className={classes.container}>
           <TextField
