@@ -285,7 +285,7 @@ export default function CreateAccountPage(props) {
           <div className={emailValid ? classes.requirementListPass : classes.requirementListFail}>
             {emailValid && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
             {!emailValid && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
-            Valid Email.
+            Please enter a valid Email address.
           </div>
         </div>
         <div className={classes.container}>

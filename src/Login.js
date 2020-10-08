@@ -20,7 +20,6 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import LockIcon from '@material-ui/icons/Lock';
 import logo from './resources/logo.jpg';
 import axios from 'axios';
-import URLSearchParams from 'axios';
 import sha256 from 'js-sha256';
 
 const useStyles = makeStyles((theme) => ({
@@ -130,7 +129,7 @@ const login = async (
       headers
     );
     console.log(res);
-    if (res.status != 200) {
+    if (res.status !== 200) {
       setAlertOpen(true);
       setAlertMessage(res.data);
       setLoading(false);
@@ -193,7 +192,7 @@ export default function Login(props) {
         setUsernameLoaded(true);
       }
     }
-  });
+  }, []);
 
   const handleAlertClose = (event, reason) => {
     if (reason === 'clickaway') {
