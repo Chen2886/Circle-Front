@@ -58,10 +58,10 @@ export default function Post() {
                   </CardContent>
                 </CardActionArea>
                 <CardActions>
-                  <Button size='small' color='primary'>
+                  <Button size='small' color='primary' onClick={handlePost}>
                     Post
                   </Button>
-                  <Button size='small' color='primary'>
+                  <Button size='small' color='primary' onClick={handleCancel}>
                     Cancel
                   </Button>
                 </CardActions>
@@ -85,7 +85,7 @@ export default function Post() {
                   <Button size='small' color='primary' onClick={handlePost}>
                     Post
                   </Button>
-                  <Button size='small' color='primary' onClick={handlePost}>
+                  <Button size='small' color='primary' onClick={handleCancel}>
                     Cancel
                   </Button>
                 </CardActions>
