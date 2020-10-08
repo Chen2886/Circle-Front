@@ -92,6 +92,13 @@ const useStyles = makeStyles((theme) => ({
   list: {
     width: 10000,
   },
+  Toolbar: {
+    maxHeight: '30px',
+  },
+  logo: {
+    marginLeft: '15px',
+    maxHeight: '30px',
+  }
 }));
 
 const font = "'Tenor Sans', sans-serif";
@@ -110,6 +117,10 @@ const theme = createMuiTheme({
   },
 });
 
+const handleSearch = (event) => {
+  if (event.key === "Enter") console.log(event.target.value);
+}
+
 export default function App(props) {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
@@ -127,6 +138,8 @@ export default function App(props) {
     setDrawerOpen(open);
   };
 
+  // const img = <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "15px", objectFit: "scale-down"}} />;
+
   return (
     <ThemeProvider theme={theme}>
       <Router>
@@ -135,15 +148,10 @@ export default function App(props) {
             <title>Home</title>
           </Helmet>
           <div className={classes.root}>
-            <AppBar position="static" className={classes.appBar}>
-              <Toolbar>
-                <Grid
-                  justify="space-between"
-                  container
-                  alignItems="center"
-                  direction="row"
-                >
-                  <Grid xs={2} item align="left">
+            <AppBar position='static' className={classes.appBar}>
+              <Toolbar className={classes.Toolbar}>
+                <Grid justify='space-between' container alignItems='center' direction='row'>
+                  <Grid xs={2} item align='left'>
                     <table>
                       <tbody>
                         <tr>
@@ -183,12 +191,7 @@ export default function App(props) {
                             </Link>
                           </td>
                           <td>
-                            <img
-                              src={logo}
-                              className={classes.pic}
-                              alt="logo"
-                              style={{ marginLeft: "15px", width: "40%" }}
-                            />
+                          <img src={logo} className={classes.pic} alt='logo' className={classes.logo}/>
                           </td>
                         </tr>
                       </tbody>
@@ -207,7 +210,8 @@ export default function App(props) {
                             root: classes.inputRoot,
                             input: classes.inputInput,
                           }}
-                          inputProps={{ "aria-label": "search" }}
+                          inputProps={{ 'aria-label': 'search' }}
+                          onKeyPress={handleSearch}
                         />
                       </div>
                     )}
