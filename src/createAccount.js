@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
-import { InputAdornment, TextField, Button, Container } from '@material-ui/core';
+import { InputAdornment, TextField, Button, Container, Backdrop, CircularProgress, Snackbar } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import { Redirect } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,6 +11,8 @@ import LockIcon from '@material-ui/icons/Lock';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import logo from './resources/logo.jpg';
+import axios from 'axios';
+import sha256 from 'js-sha256';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -80,6 +83,10 @@ const useStyles = makeStyles(() => ({
     paddingLeft: '5px',
     paddingRight: '5px',
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
 }));
 
 const font = "'Tenor Sans', sans-serif";
@@ -90,7 +97,7 @@ const theme = createMuiTheme({
   },
 });
 
-function createAccount(
+const createAccount = async (
   username,
   password,
   retypePassword,
@@ -99,19 +106,50 @@ function createAccount(
   setRedirectToHome,
   passwordLength,
   passwordLower,
-  passwordUpper
-) {
-  // TODO: call api
-  if (passwordLength || passwordLower || passwordUpper) return;
-  if (password !== retypePassword) return;
-  if (username === '' || password === '' || email === '') setMissingRequired(true);
-  else {
-    setRedirectToHome(true);
-    console.log(email);
+  passwordUpper,
+  setLoading,
+  setAlertOpen,
+  setAlertMessage
+) => {
+  // if any fields are empty
+  if (username === '' || password === '' || email === '') {
+    setMissingRequired(true);
+    return;
   }
+  if (!passwordLength || !passwordLower || !passwordUpper) return;
+  if (password !== retypePassword) return;
+
+  // if redirect or not
+  var data = {
+    username: username,
+    password: sha256(password),
+    email: email,
+  };
+  var headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json',
+  };
+
+  // show loading
+  setLoading(true);
+  try {
+    let res = await axios.post('https://cs307circle-production.herokuapp.com/api/createUser', data, headers);
+    console.log(res.data);
+  } catch (err) {
+    console.log(err.response.data);
+    setAlertOpen(true);
+    setAlertMessage(err.response.data);
+    setLoading(false);
+    return;
+  }
+  setRedirectToHome(true);
+};
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant='filled' {...props} />;
 }
 
-export default function Login(props) {
+export default function CreateAccountPage(props) {
   // turn off search field for login page
   props.setShowSearchField(false);
   props.setShowLoginButton(false);
@@ -119,17 +157,30 @@ export default function Login(props) {
   // styles
   const classes = useStyles();
 
-  // hooks
+  // information
   const [password, setPassword] = React.useState('');
   const [retypePassword, setRetypePassword] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [email, setEmail] = React.useState('');
+
+  // empty validation
   const [missingRequired, setMissingRequired] = React.useState(false);
+
+  // hook to go back to home
   const [redirectToHome, setRedirectToHome] = React.useState(false);
 
+  const [emailValid, setEmailValid] = React.useState(false);
+  // password validation
   const [passwordLength, setPasswordLength] = React.useState(false);
   const [passwordLower, setPasswordLower] = React.useState(false);
   const [passwordUpper, setPasswordUpper] = React.useState(false);
+
+  // backdrop loading
+  const [loading, setLoading] = React.useState(false);
+
+  // alert hook
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState('');
 
   const passwordChanged = (e) => {
     var pass = e.target.value;
@@ -147,13 +198,31 @@ export default function Login(props) {
     if (/[A-Z]/.test(pass)) setPasswordUpper(true);
     else setPasswordUpper(false);
   };
+  const handleAlertClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setAlertOpen(false);
+  };
   const usernameChanged = (e) => setUsername(e.target.value);
-  const emailChanged = (e) => setEmail(e.target.value);
+  const emailChanged = (e) => {
+    if (/[^@]*@[^.]*\..+/.test(e.target.value)) setEmailValid(true);
+    else setEmailValid(false);
+    setEmail(e.target.value);
+  };
   const retypePasswordChanged = (e) => setRetypePassword(e.target.value);
 
   return (
     <MuiThemeProvider theme={theme}>
       {redirectToHome && <Redirect push to='/' />}
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={handleAlertClose} severity='error'>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
+      <Backdrop className={classes.backdrop} open={loading} onClick={() => setLoading(false)}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
       <Container maxWidth='sm'>
         <div className={classes.first}>
           <img src={logo} className={classes.pic} alt='logo' style={{ width: '20%' }} />
@@ -213,6 +282,13 @@ export default function Login(props) {
           />
         </div>
         <div className={classes.container}>
+          <div className={emailValid ? classes.requirementListPass : classes.requirementListFail}>
+            {emailValid && <CheckIcon className={classes.requirementListIcons}></CheckIcon>}
+            {!emailValid && <CloseIcon className={classes.requirementListIcons}></CloseIcon>}
+            Valid Email.
+          </div>
+        </div>
+        <div className={classes.container}>
           <TextField
             required
             fullWidth
@@ -222,7 +298,7 @@ export default function Login(props) {
             type='password'
             onChange={passwordChanged}
             className={classes.textField}
-            error={missingRequired && password === ''}
+            error={missingRequired ? password === '' || !passwordLength || !passwordLower || !passwordUpper : false}
             InputProps={{
               startAdornment: (
                 <InputAdornment position='start'>
@@ -264,7 +340,7 @@ export default function Login(props) {
             type='password'
             onChange={retypePasswordChanged}
             className={classes.textField}
-            error={missingRequired && password === ''}
+            error={(missingRequired && retypePassword === '') || password !== retypePassword}
             InputProps={{
               startAdornment: (
                 <InputAdornment position='start'>
@@ -303,7 +379,10 @@ export default function Login(props) {
                 setRedirectToHome,
                 passwordLength,
                 passwordLower,
-                passwordUpper
+                passwordUpper,
+                setLoading,
+                setAlertOpen,
+                setAlertMessage
               )
             }
             classes={{
