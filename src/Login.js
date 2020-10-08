@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Redirect, Link } from 'react-router-dom';
+import { Redirect, Link, useHistory } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -97,7 +97,8 @@ const login = async (
   setLoggedIn,
   setLoading,
   setAlertOpen,
-  setAlertMessage
+  setAlertMessage,
+  history
 ) => {
   localStorage.setItem('username', rememberMe && username.length !== 0 ? username : '');
   localStorage.setItem('rememberMe', rememberMe);
@@ -137,7 +138,8 @@ const login = async (
     } else {
       console.log(res.data);
       setLoading(false);
-      goHome(setRedirectToHome, setLoggedIn);
+      setLoggedIn(true);
+      history.push('/');
     }
   } catch (err) {
     console.log(err);
@@ -148,12 +150,6 @@ const login = async (
   }
 };
 
-const goHome = (setRedirectToHome, setLoggedIn /*, setUserInfo*/) => {
-  // TODO: set user information
-  setLoggedIn(true);
-  setRedirectToHome(true);
-};
-
 function Alert(props) {
   return <MuiAlert elevation={6} variant='filled' {...props} />;
 }
@@ -162,6 +158,8 @@ export default function Login(props) {
   // turn off search field for login page
   props.setShowSearchField(false);
   props.setShowLoginButton(false);
+
+  const history = useHistory();
 
   // styles
   const classes = useStyles();
@@ -266,7 +264,8 @@ export default function Login(props) {
                   props.setLoggedIn,
                   setLoading,
                   setAlertOpen,
-                  setAlertMessage
+                  setAlertMessage,
+                  history
                 );
             }}
             InputProps={{
@@ -311,7 +310,8 @@ export default function Login(props) {
                 props.setLoggedIn,
                 setLoading,
                 setAlertOpen,
-                setAlertMessage
+                setAlertMessage,
+                history
               )
             }
             classes={{
