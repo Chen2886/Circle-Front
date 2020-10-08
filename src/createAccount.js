@@ -12,6 +12,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import logo from './resources/logo.jpg';
 import axios from 'axios';
+import sha256 from 'js-sha256';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -119,17 +120,20 @@ const createAccount = async (
   if (password !== retypePassword) return;
 
   // if redirect or not
-
   var data = {
     username: username,
-    password: password,
+    password: sha256(password),
     email: email,
+  };
+  var headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json',
   };
 
   // show loading
   setLoading(true);
   try {
-    let res = await axios.post('http://circle-backend-staging.herokuapp.com/api/createUser');
+    let res = await axios.post('https://cs307circle-production.herokuapp.com/api/createUser', data, headers);
     console.log(res.data);
   } catch (err) {
     console.log(err.response.data);
