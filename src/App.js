@@ -1,19 +1,24 @@
 import './App.css';
-import Login from './Login.js';
-import Main from './Main.js';
-import ProfileExample from './ProfileExample.js';
-import Profile from './Profile.js'
-import CreateAccount from './createAccount.js';
+import logo from './resources/logo.png';
 import React from 'react';
+
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import { Grid, InputBase, AppBar, Button, Toolbar, IconButton, Typography } from '@material-ui/core';
+import Helmet from 'react-helmet';
+
+import { ThemeProvider } from '@material-ui/styles';
+import { Grid, InputBase, AppBar, Button, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText } from '@material-ui/core';
 import { fade, makeStyles } from '@material-ui/core/styles';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import Helmet from 'react-helmet';
-import logo from './resources/logo.png';
+
+import Login from './Login.js';
+import Main from './Main.js';
+import ProfileExample from './ProfileExample.js';
+import Profile from './Profile.js';
+import CreateAccount from './createAccount.js';
+import Post from './Post.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -78,6 +83,16 @@ const useStyles = makeStyles((theme) => ({
   centerText: {
     textAlign: 'center',
   },
+  list: {
+    width: 10000,
+  },
+  Toolbar: {
+    maxHeight: '30px',
+  },
+  logo: {
+    marginLeft: '15px',
+    maxHeight: '30px',
+  },
 }));
 
 const font = "'Tenor Sans', sans-serif";
@@ -86,6 +101,14 @@ const theme = createMuiTheme({
   typography: {
     fontFamily: font,
   },
+  palette: {
+    primary: {
+      main: '#528487',
+    },
+    secondary: {
+      main: '#BFD9DB',
+    },
+  },
 });
 
 const isUserLoggedIn = () => {
@@ -93,13 +116,31 @@ const isUserLoggedIn = () => {
   return true;
 };
 
+const handleSearch = (event) => {
+  if (event.key === 'Enter') console.log(event.target.value);
+};
+
 export default function App(props) {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
   const [showLoginButton, setShowLoginButton] = React.useState(true);
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const toggleDrawer = (open) => (event) => {
+    // if (
+    //   event.type === "keydown" &&
+    //   (event.key === "Tab" || event.key === "Shift")
+    // ) {
+    //   return;
+    // }
+    setDrawerOpen(open);
+  };
+
+  // const img = <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "15px", objectFit: "scale-down"}} />;
 
   return (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <Router>
         <div className={classes.grow}>
           <Helmet>
@@ -108,16 +149,26 @@ export default function App(props) {
           </Helmet>
           <div className={classes.root}>
             <AppBar position='static' className={classes.appBar}>
-              <Toolbar>
+              <Toolbar className={classes.Toolbar}>
                 <Grid justify='space-between' container alignItems='center' direction='row'>
                   <Grid xs={2} item align='left'>
                     <table>
                       <tbody>
                         <tr>
                           <td>
-                            <IconButton edge='start' className={classes.menuButton} color='inherit' aria-label='menu'>
+                            <IconButton onClick={toggleDrawer(true)} edge='start' className={classes.menuButton} color='inherit' aria-label='menu'>
                               <MenuIcon />
                             </IconButton>
+                            <Drawer anchor='left' onClose={toggleDrawer(false)} open={drawerOpen}>
+                              <List>
+                                <ListItem button component='a' key='Home' href='/'>
+                                  <ListItemText primary='Home' />
+                                </ListItem>
+                                <ListItem button component='a' key='New Post' href='/newPost'>
+                                  <ListItemText primary='New Post' />
+                                </ListItem>
+                              </List>
+                            </Drawer>
                           </td>
                           <td>
                             <Link to='/' className={classes.link}>
@@ -127,7 +178,7 @@ export default function App(props) {
                             </Link>
                           </td>
                           <td>
-                            <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: '15px', width: '40%' }} />
+                            <img src={logo} className={classes.pic} alt='logo' className={classes.logo} />
                           </td>
                         </tr>
                       </tbody>
@@ -147,6 +198,7 @@ export default function App(props) {
                             input: classes.inputInput,
                           }}
                           inputProps={{ 'aria-label': 'search' }}
+                          onKeyPress={handleSearch}
                         />
                       </div>
                     )}
@@ -179,8 +231,15 @@ export default function App(props) {
           </div>
         </div>
         <Switch>
+          <Route
+            exact
+            path='/login'
+            component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setLoggedIn={setLoggedIn} />}
+          />
+          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
+          <Route exact path='/newPost' component={() => <Post />} />
           <Route
             exact
             path='/createAccount'
@@ -198,6 +257,6 @@ export default function App(props) {
           />
         </Switch>
       </Router>
-    </MuiThemeProvider>
+    </ThemeProvider>
   );
 }

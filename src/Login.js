@@ -1,12 +1,26 @@
 import './App.css';
 import React, { useEffect } from 'react';
-import { InputAdornment, TextField, Button, Checkbox, FormControlLabel, Typography, Container } from '@material-ui/core';
-import { Redirect, Link } from 'react-router-dom';
+import {
+  InputAdornment,
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Typography,
+  Container,
+  Snackbar,
+  Backdrop,
+  CircularProgress,
+} from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
+import { Redirect, Link, useHistory } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import LockIcon from '@material-ui/icons/Lock';
 import logo from './resources/logo.jpg';
+import axios from 'axios';
+import sha256 from 'js-sha256';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -74,12 +88,70 @@ const theme = createMuiTheme({
   },
 });
 
-function login(username, password, rememberMe, setMissingRequired, setRedirectToHome) {
-  // TODO: call api
+const login = async (
+  username,
+  password,
+  rememberMe,
+  setMissingRequired,
+  setRedirectToHome,
+  setLoggedIn,
+  setLoading,
+  setAlertOpen,
+  setAlertMessage,
+  history
+) => {
   localStorage.setItem('username', rememberMe && username.length !== 0 ? username : '');
   localStorage.setItem('rememberMe', rememberMe);
-  if (username === '' || password === '') setMissingRequired(true);
-  else setRedirectToHome(true);
+
+  // if any fields are empty
+  if (username === '' || password === '') {
+    setMissingRequired(true);
+    return;
+  }
+
+  // if redirect or not
+  var data = {
+    username: username,
+    password: sha256(password),
+  };
+  var headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json',
+  };
+
+  // show loading
+  setLoading(true);
+  try {
+    let res = await axios.get(
+      'https://cs307circle-production.herokuapp.com/api/login',
+      {
+        params: data,
+      },
+      headers
+    );
+    console.log(res);
+    if (res.status !== 200) {
+      setAlertOpen(true);
+      setAlertMessage(res.data);
+      setLoading(false);
+      return;
+    } else {
+      console.log(res.data);
+      setLoading(false);
+      setLoggedIn(true);
+      history.push('/');
+    }
+  } catch (err) {
+    console.log(err);
+    setAlertOpen(true);
+    setAlertMessage(err.toString());
+    setLoading(false);
+    return;
+  }
+};
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant='filled' {...props} />;
 }
 
 export default function Login(props) {
@@ -87,15 +159,25 @@ export default function Login(props) {
   props.setShowSearchField(false);
   props.setShowLoginButton(false);
 
+  const history = useHistory();
+
   // styles
   const classes = useStyles();
 
   // hooks
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
+  const [usernameLoaded, setUsernameLoaded] = React.useState(false);
   const [missingRequired, setMissingRequired] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(true);
   const [redirectToHome, setRedirectToHome] = React.useState(false);
+
+  // backdrop loading
+  const [loading, setLoading] = React.useState(false);
+
+  // alert hook
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState('');
 
   const passwordChanged = (e) => setPassword(e.target.value);
   const usernameChanged = (e) => setUsername(e.target.value);
@@ -103,13 +185,31 @@ export default function Login(props) {
 
   useEffect(() => {
     if (localStorage.getItem('rememberMe')) {
-      setUsername(localStorage.getItem('username'));
+      if (!usernameLoaded) {
+        setUsername(localStorage.getItem('username'));
+        setUsernameLoaded(true);
+      }
     }
-  });
+  }, []);
+
+  const handleAlertClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setAlertOpen(false);
+  };
 
   return (
     <MuiThemeProvider theme={theme}>
       {redirectToHome && <Redirect push to='/' />}
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={handleAlertClose} severity='error'>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
+      <Backdrop className={classes.backdrop} open={loading} onClick={() => setLoading(false)}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
       <Container maxWidth='sm'>
         <div className={classes.first}>
           <img src={logo} className={classes.pic} alt='logo' style={{ width: '20%' }} />
@@ -154,7 +254,19 @@ export default function Login(props) {
             className={classes.textField}
             error={missingRequired && password === ''}
             onKeyPress={(event) => {
-              if (event.key === 'Enter') login(username, password, rememberMe, setMissingRequired, setRedirectToHome);
+              if (event.key === 'Enter')
+                login(
+                  username,
+                  password,
+                  rememberMe,
+                  setMissingRequired,
+                  setRedirectToHome,
+                  props.setLoggedIn,
+                  setLoading,
+                  setAlertOpen,
+                  setAlertMessage,
+                  history
+                );
             }}
             InputProps={{
               startAdornment: (
@@ -188,7 +300,20 @@ export default function Login(props) {
           <Button
             variant='outlined'
             color='primary'
-            onClick={() => login(username, password, rememberMe, setMissingRequired, setRedirectToHome)}
+            onClick={() =>
+              login(
+                username,
+                password,
+                rememberMe,
+                setMissingRequired,
+                setRedirectToHome,
+                props.setLoggedIn,
+                setLoading,
+                setAlertOpen,
+                setAlertMessage,
+                history
+              )
+            }
             classes={{
               root: classes.button,
               label: classes.buttonLabel,
