@@ -120,6 +120,7 @@ export default function App(props) {
   const [showLoginButton, setShowLoginButton] = React.useState(true);
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [user, setUser] = React.useState('');
 
   const toggleDrawer = (open) => (event) => {
     // if (
@@ -172,7 +173,7 @@ export default function App(props) {
                             </Link>
                           </td>
                           <td>
-                            <img src={logo} className={classes.pic} alt='logo' className={classes.logo} />
+                            <img src={logo} alt='logo' className={classes.logo} />
                           </td>
                         </tr>
                       </tbody>
@@ -228,7 +229,7 @@ export default function App(props) {
           <Route
             exact
             path='/login'
-            component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setLoggedIn={setLoggedIn} />}
+            component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setLoggedIn={setLoggedIn} setUser={setUser} />}
           />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
@@ -242,7 +243,7 @@ export default function App(props) {
           <Route
             exact
             path='/profile'
-            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setLoggedIn={setLoggedIn} />}
+            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} user={user} setLoggedIn={setLoggedIn} />}
           />
         </Switch>
       </Router>

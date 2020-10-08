@@ -1,10 +1,12 @@
 import './App.css';
-import React from 'react';
+import Alert from './Alert.js';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
-import { Grid, Button, Typography, Card, TextField, Divider, Chip, Avatar } from '@material-ui/core';
+import { Grid, Button, Typography, Card, TextField, Divider, Chip, Avatar, Snackbar } from '@material-ui/core';
 import FaceIcon from '@material-ui/icons/Face';
 import DoneIcon from '@material-ui/icons/Done';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   avatarCard: {
@@ -89,23 +91,67 @@ const handleDelete = () => {
   console.info('You clicked the delete icon.');
 };
 
-export default function Main(props) {
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Content-Type': 'application/json',
+};
+
+export default function Profile(props) {
+  const history = useHistory();
+  const classes = useStyles();
+
+  // if user is not logged in
+  if (props.user === null || props.user === '') history.push('/');
+
+  // hooks
+  const [bio, setBio] = React.useState('');
+  const [user, setUser] = React.useState({});
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState('');
+
+  useEffect(() => getUser(props.user), []);
+
   props.setShowSearchField(true);
   props.setShowLoginButton(true);
-
-  const history = useHistory();
 
   const handleLogout = () => {
     props.setLoggedIn(false);
     history.push('/');
-  }
+  };
 
-  const [bio, setBio] = React.useState('');
+  const getUser = (user) => {
+    try {
+      axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/getUser',
+          {
+            params: { username: user },
+          },
+          headers
+        )
+        .then(function (res) {
+          console.log(res);
+          setUser(res.data);
+        });
+    } catch (err) {
+      setAlertOpen(true);
+      setAlertMessage(err.response.data);
+      return;
+    }
+  };
 
-  const classes = useStyles();
+  const handleAlertClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setAlertOpen(false);
+  };
 
   return (
     <>
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={handleAlertClose} severity='error'>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
       <Card className={classes.avatarCard}>
         <div className={classes.avatarContainer}>
           <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} />
@@ -113,7 +159,7 @@ export default function Main(props) {
         <div className={classes.infoContainer}>
           <div className={classes.flexDisplay}>
             <Typography variant='h4' style={{ float: 'left' }}>
-              First Last
+              {user.username}
             </Typography>
             <Button variant='outlined' style={{ marginLeft: '2rem' }} onClick={handleLogout}>
               Logout
@@ -137,7 +183,6 @@ export default function Main(props) {
               onFocus={(e) => bioFocus(setBio, e)}
               onBlur={(e) => bioBlur(setBio, e)}
               variant='outlined'
-              on
             />
           </div>
         </div>
@@ -178,7 +223,7 @@ export default function Main(props) {
         <Typography variant='h6' className={classes.infoTitle}>
           Followed Circles
         </Typography>
-        <div style={{width: '75%', margin: '0 auto', marginBottom: '3rem'}}>
+        <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
           <div className={classes.followedCircles}>
             <Chip variant='outlined' size='small' label='Basic' />
             <Chip variant='outlined' size='small' avatar={<Avatar>M</Avatar>} label='Clickable' onClick={handleClick} />

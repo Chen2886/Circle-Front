@@ -12,7 +12,7 @@ import {
   Backdrop,
   CircularProgress,
 } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
+import Alert from './Alert.js';
 import { Redirect, Link, useHistory } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
@@ -93,12 +93,12 @@ const login = async (
   password,
   rememberMe,
   setMissingRequired,
-  setRedirectToHome,
   setLoggedIn,
   setLoading,
   setAlertOpen,
   setAlertMessage,
-  history
+  history,
+  setUser
 ) => {
   localStorage.setItem('username', rememberMe && username.length !== 0 ? username : '');
   localStorage.setItem('rememberMe', rememberMe);
@@ -129,30 +129,17 @@ const login = async (
       },
       headers
     );
-    console.log(res);
-    if (res.status !== 200) {
-      setAlertOpen(true);
-      setAlertMessage(res.data);
-      setLoading(false);
-      return;
-    } else {
-      console.log(res.data);
-      setLoading(false);
-      setLoggedIn(true);
-      history.push('/');
-    }
+    setLoading(false);
+    setLoggedIn(true);
+    setUser(username);
+    history.push('/');
   } catch (err) {
-    console.log(err);
     setAlertOpen(true);
-    setAlertMessage(err.toString());
+    setAlertMessage(err.response.data);
     setLoading(false);
     return;
   }
 };
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant='filled' {...props} />;
-}
 
 export default function Login(props) {
   // turn off search field for login page
@@ -167,10 +154,8 @@ export default function Login(props) {
   // hooks
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
-  const [usernameLoaded, setUsernameLoaded] = React.useState(false);
   const [missingRequired, setMissingRequired] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(true);
-  const [redirectToHome, setRedirectToHome] = React.useState(false);
 
   // backdrop loading
   const [loading, setLoading] = React.useState(false);
@@ -185,10 +170,7 @@ export default function Login(props) {
 
   useEffect(() => {
     if (localStorage.getItem('rememberMe')) {
-      if (!usernameLoaded) {
-        setUsername(localStorage.getItem('username'));
-        setUsernameLoaded(true);
-      }
+      setUsername(localStorage.getItem('username'));
     }
   }, []);
 
@@ -201,7 +183,6 @@ export default function Login(props) {
 
   return (
     <MuiThemeProvider theme={theme}>
-      {redirectToHome && <Redirect push to='/' />}
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Alert onClose={handleAlertClose} severity='error'>
           {alertMessage}
@@ -260,12 +241,12 @@ export default function Login(props) {
                   password,
                   rememberMe,
                   setMissingRequired,
-                  setRedirectToHome,
                   props.setLoggedIn,
                   setLoading,
                   setAlertOpen,
                   setAlertMessage,
-                  history
+                  history,
+                  props.setUser
                 );
             }}
             InputProps={{
@@ -306,12 +287,12 @@ export default function Login(props) {
                 password,
                 rememberMe,
                 setMissingRequired,
-                setRedirectToHome,
                 props.setLoggedIn,
                 setLoading,
                 setAlertOpen,
                 setAlertMessage,
-                history
+                history,
+                props.setUser
               )
             }
             classes={{

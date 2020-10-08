@@ -2,7 +2,7 @@ import './App.css';
 import React from 'react';
 import { InputAdornment, TextField, Button, Container, Backdrop, CircularProgress, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -97,19 +97,24 @@ const theme = createMuiTheme({
   },
 });
 
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Content-Type': 'application/json',
+};
+
 const createAccount = async (
   username,
   password,
   retypePassword,
   email,
   setMissingRequired,
-  setRedirectToHome,
   passwordLength,
   passwordLower,
   passwordUpper,
   setLoading,
   setAlertOpen,
-  setAlertMessage
+  setAlertMessage,
+  history
 ) => {
   // if any fields are empty
   if (username === '' || password === '' || email === '') {
@@ -125,10 +130,6 @@ const createAccount = async (
     password: sha256(password),
     email: email,
   };
-  var headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/json',
-  };
 
   // show loading
   setLoading(true);
@@ -142,7 +143,7 @@ const createAccount = async (
     setLoading(false);
     return;
   }
-  setRedirectToHome(true);
+  history.push('/');
 };
 
 function Alert(props) {
@@ -157,6 +158,8 @@ export default function CreateAccountPage(props) {
   // styles
   const classes = useStyles();
 
+  const history = useHistory();
+
   // information
   const [password, setPassword] = React.useState('');
   const [retypePassword, setRetypePassword] = React.useState('');
@@ -165,9 +168,6 @@ export default function CreateAccountPage(props) {
 
   // empty validation
   const [missingRequired, setMissingRequired] = React.useState(false);
-
-  // hook to go back to home
-  const [redirectToHome, setRedirectToHome] = React.useState(false);
 
   const [emailValid, setEmailValid] = React.useState(false);
   // password validation
@@ -214,7 +214,6 @@ export default function CreateAccountPage(props) {
 
   return (
     <MuiThemeProvider theme={theme}>
-      {redirectToHome && <Redirect push to='/' />}
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Alert onClose={handleAlertClose} severity='error'>
           {alertMessage}
@@ -376,13 +375,13 @@ export default function CreateAccountPage(props) {
                 retypePassword,
                 email,
                 setMissingRequired,
-                setRedirectToHome,
                 passwordLength,
                 passwordLower,
                 passwordUpper,
                 setLoading,
                 setAlertOpen,
-                setAlertMessage
+                setAlertMessage,
+                history
               )
             }
             classes={{
