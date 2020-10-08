@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from '@material-ui/core';
 import Alert from './Alert.js';
-import { Redirect, Link, useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
