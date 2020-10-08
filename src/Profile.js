@@ -1,11 +1,10 @@
 import './App.css';
 import React from 'react';
-import { fade, makeStyles } from '@material-ui/core/styles';
-import { Redirect, Link, useHistory } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
+import { useHistory } from 'react-router-dom';
 import { Grid, Button, Typography, Card, TextField, Divider, Chip, Avatar } from '@material-ui/core';
 import FaceIcon from '@material-ui/icons/Face';
 import DoneIcon from '@material-ui/icons/Done';
-import InfoIcon from '@material-ui/icons/Info';
 
 const useStyles = makeStyles((theme) => ({
   avatarCard: {
