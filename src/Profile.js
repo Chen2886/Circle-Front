@@ -8,11 +8,17 @@ import FaceIcon from '@material-ui/icons/Face';
 import DoneIcon from '@material-ui/icons/Done';
 import axios from 'axios';
 
+const font = "'Tenor Sans', sans-serif";
+
 const useStyles = makeStyles((theme) => ({
   avatarCard: {
     margin: '2rem',
     display: 'flex',
     boxShadow: '0px 10px 13px -7px #000000, 0px 0px 8px 0px rgba(0,0,0,0)',
+    width: '60%',
+  },
+  settingsCard: {
+    width: '40%',
   },
   infoCard: {
     margin: '2rem',
@@ -72,6 +78,15 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(0.5),
     },
   },
+  buttonLabel: {
+    float: 'right',
+    fontFamily: font,
+    color: '#528487',
+  },
+  button: {
+    borderColor: '#528487',
+    float: 'right',
+  },
 }));
 
 const bioFocus = (setBio, e) => {
@@ -118,11 +133,6 @@ export default function Profile(props) {
   // initialize the user
   useEffect(() => getUser(requestedUser), []);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    history.push('/');
-  };
-
   const getUser = (requestedUser) => {
     axios
       .get(
@@ -166,9 +176,15 @@ export default function Profile(props) {
             <div className={classes.infoContainer}>
               <div className={classes.flexDisplay}>
                 <Typography variant='h4' style={{ float: 'left' }}>
-                  {requestedUserObj == null ? '' : requestedUserObj.username}
+                  {requestedUserObj === null ? '' : requestedUserObj.username}
                 </Typography>
-                <Button variant='outlined' style={{ marginLeft: '2rem' }} onClick={handleLogout}>
+                <Button
+                  variant='outlined'
+                  style={{ marginLeft: '1rem' }}
+                  classes={{
+                    root: classes.button,
+                    label: classes.buttonLabel,
+                  }}>
                   Logout
                 </Button>
               </div>

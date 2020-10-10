@@ -89,7 +89,7 @@ const theme = createMuiTheme({
 });
 
 const login = async (username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history) => {
-  localStorage.setItem('username', rememberMe && username.length !== 0 ? username : '');
+  localStorage.setItem('username', username);
   localStorage.setItem('rememberMe', rememberMe);
 
   // if any fields are empty
@@ -111,7 +111,7 @@ const login = async (username, password, rememberMe, setMissingRequired, setLoad
   // show loading
   setLoading(true);
   try {
-    let res = await axios.get(
+    await axios.get(
       'https://cs307circle-production.herokuapp.com/api/login',
       {
         params: data,
@@ -151,7 +151,8 @@ export default function Login(props) {
   const changeRememberMe = (e) => setRememberMe(e.target.checked);
 
   useEffect(() => {
-    if (localStorage.getItem('rememberMe')) setUsername(localStorage.getItem('username'));
+    setUsername(localStorage.getItem('username'));
+    console.log(localStorage.getItem('username'));
   }, []);
 
   const handleAlertClose = (event, reason) => {
