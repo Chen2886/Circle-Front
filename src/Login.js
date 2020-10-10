@@ -130,24 +130,22 @@ const login = async (username, password, rememberMe, setMissingRequired, setLoad
 };
 
 export default function Login(props) {
+  // Disable search and login
+  // Add history and styles
+  // Get requested user from URL param
+  // Hooks
+  // textfield changes
   props.setShowSearchField(false);
   props.setShowLoginButton(false);
   const history = useHistory();
   const classes = useStyles();
-
-  // hooks
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [missingRequired, setMissingRequired] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(true);
-
-  // backdrop loading
   const [loading, setLoading] = React.useState(false);
-
-  // alert hook
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
-
   const passwordChanged = (e) => setPassword(e.target.value);
   const usernameChanged = (e) => setUsername(e.target.value);
   const changeRememberMe = (e) => setRememberMe(e.target.checked);
@@ -157,9 +155,7 @@ export default function Login(props) {
   }, []);
 
   const handleAlertClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setAlertOpen(false);
   };
 
