@@ -2,7 +2,7 @@ import './App.css';
 import Alert from './Alert.js';
 import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Grid, Button, Typography, Card, TextField, Divider, Chip, Avatar, Snackbar } from '@material-ui/core';
 import FaceIcon from '@material-ui/icons/Face';
 import DoneIcon from '@material-ui/icons/Done';
@@ -97,47 +97,51 @@ const headers = {
 };
 
 export default function Profile(props) {
-  const history = useHistory();
-  const classes = useStyles();
-
-  // if user is not logged in
-  if (props.user === null || props.user === '') history.push('/');
-
-  // hooks
-  const [bio, setBio] = React.useState('');
-  const [user, setUser] = React.useState({});
-  const [alertOpen, setAlertOpen] = React.useState(false);
-  const [alertMessage, setAlertMessage] = React.useState('');
-
-  useEffect(() => getUser(props.user), []);
-
+  // Disable search and login
+  // Add history and styles
+  // Get requested user from URL param
+  // Hooks
   props.setShowSearchField(true);
   props.setShowLoginButton(true);
+  const history = useHistory();
+  const classes = useStyles();
+  let { requestedUser } = useParams();
+  const [bio, setBio] = React.useState('');
+  const [requestedUserObj, setRequestedUserObj] = React.useState({});
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState('');
+  const [userError, setUserError] = React.useState(false);
+
+  // if url does not include requested user
+  if (requestedUser === null || requestedUser === '') history.push('/');
+
+  // initialize the user
+  useEffect(() => getUser(requestedUser), []);
 
   const handleLogout = () => {
-    props.setLoggedIn(false);
+    localStorage.clear();
     history.push('/');
   };
 
-  const getUser = (user) => {
-    try {
-      axios
-        .get(
-          'https://cs307circle-production.herokuapp.com/api/getUser',
-          {
-            params: { username: user },
-          },
-          headers
-        )
-        .then(function (res) {
-          console.log(res);
-          setUser(res.data);
-        });
-    } catch (err) {
-      setAlertOpen(true);
-      setAlertMessage(err.response.data);
-      return;
-    }
+  const getUser = (requestedUser) => {
+    axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/getUser',
+        {
+          params: { username: requestedUser },
+        },
+        headers
+      )
+      .then(function (res) {
+        console.log(res);
+        setRequestedUserObj(res.data);
+      })
+      .catch(function (err) {
+        console.log(err);
+        setAlertOpen(true);
+        setAlertMessage(err.response.data);
+        setUserError(true);
+      });
   };
 
   const handleAlertClose = (event, reason) => {
@@ -147,127 +151,132 @@ export default function Profile(props) {
 
   return (
     <>
-      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={handleAlertClose} severity='error'>
-          {alertMessage}
-        </Alert>
-      </Snackbar>
-      <Card className={classes.avatarCard}>
-        <div className={classes.avatarContainer}>
-          <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} />
-        </div>
-        <div className={classes.infoContainer}>
-          <div className={classes.flexDisplay}>
-            <Typography variant='h4' style={{ float: 'left' }}>
-              {user.username}
-            </Typography>
-            <Button variant='outlined' style={{ marginLeft: '2rem' }} onClick={handleLogout}>
-              Logout
-            </Button>
-          </div>
-          <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
-            <Typography variant='h6' style={{ float: 'left' }}>
-              22 Friends
-            </Typography>
-            <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
-              89 Comment
-            </Typography>
-          </div>
-          <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
-            <TextField
-              label='Bio'
-              fullWidth
-              multiline
-              rows={4}
-              defaultValue={bio}
-              onFocus={(e) => bioFocus(setBio, e)}
-              onBlur={(e) => bioBlur(setBio, e)}
-              variant='outlined'
-            />
-          </div>
-        </div>
-      </Card>
-      <Card className={classes.infoCard}>
-        <div className={classes.gridContainer}>
-          <Grid container>
+      {userError && <div>User does not exist!</div>}
+      {!userError && (
+        <>
+          <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+            <Alert onClose={handleAlertClose} severity='error'>
+              {alertMessage}
+            </Alert>
+          </Snackbar>
+          <Card className={classes.avatarCard}>
+            <div className={classes.avatarContainer}>
+              <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} />
+            </div>
+            <div className={classes.infoContainer}>
+              <div className={classes.flexDisplay}>
+                <Typography variant='h4' style={{ float: 'left' }}>
+                  {requestedUserObj == null ? '' : requestedUserObj.username}
+                </Typography>
+                <Button variant='outlined' style={{ marginLeft: '2rem' }} onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
+              <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
+                <Typography variant='h6' style={{ float: 'left' }}>
+                  22 Friends
+                </Typography>
+                <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
+                  89 Comment
+                </Typography>
+              </div>
+              <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
+                <TextField
+                  label='Bio'
+                  fullWidth
+                  multiline
+                  rows={4}
+                  defaultValue={bio}
+                  onFocus={(e) => bioFocus(setBio, e)}
+                  onBlur={(e) => bioBlur(setBio, e)}
+                  variant='outlined'
+                />
+              </div>
+            </div>
+          </Card>
+          <Card className={classes.infoCard}>
+            <div className={classes.gridContainer}>
+              <Grid container>
+                <Typography variant='h6' className={classes.infoTitle}>
+                  User information
+                </Typography>
+              </Grid>
+              <Grid container spacing={3}>
+                <Grid item xs={6}>
+                  <div className={classes.flexDisplay}>
+                    <TextField type='text' variant='outlined' className={classes.textField} label='Username' fullWidth />
+                  </div>
+                </Grid>
+                <Grid item xs={6}>
+                  <div className={classes.flexDisplay}>
+                    <TextField type='email' variant='outlined' className={classes.textField} label='Email' fullWidth />
+                  </div>
+                </Grid>
+              </Grid>
+              <Grid container spacing={3}>
+                <Grid item xs={6}>
+                  <div className={classes.flexDisplay}>
+                    <TextField type='text' variant='outlined' className={classes.textField} label='First Name' fullWidth />
+                  </div>
+                </Grid>
+                <Grid item xs={6}>
+                  <div className={classes.flexDisplay}>
+                    <TextField type='text' variant='outlined' className={classes.textField} label='Last Name' fullWidth />
+                  </div>
+                </Grid>
+              </Grid>
+            </div>
+            <Divider variant='middle' />
             <Typography variant='h6' className={classes.infoTitle}>
-              User information
+              Followed Circles
             </Typography>
-          </Grid>
-          <Grid container spacing={3}>
-            <Grid item xs={6}>
-              <div className={classes.textFieldContainer}>
-                <TextField type='text' variant='outlined' className={classes.textField} label='Username' fullWidth />
+            <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+              <div className={classes.followedCircles}>
+                <Chip variant='outlined' size='small' label='Basic' />
+                <Chip variant='outlined' size='small' avatar={<Avatar>M</Avatar>} label='Clickable' onClick={handleClick} />
+                <Chip
+                  variant='outlined'
+                  size='small'
+                  avatar={<Avatar alt='Natacha' src='/static/images/avatar/1.jpg' />}
+                  label='Deletable'
+                  onDelete={handleDelete}
+                />
+                <Chip variant='outlined' size='small' icon={<FaceIcon />} label='Clickable deletable' onClick={handleClick} onDelete={handleDelete} />
+                <Chip
+                  variant='outlined'
+                  size='small'
+                  label='Custom delete icon'
+                  onClick={handleClick}
+                  onDelete={handleDelete}
+                  deleteIcon={<DoneIcon />}
+                />
+                <Chip variant='outlined' size='small' label='Clickable link' component='a' href='#chip' clickable />
+                <Chip
+                  variant='outlined'
+                  size='small'
+                  avatar={<Avatar>M</Avatar>}
+                  label='Primary clickable'
+                  clickable
+                  color='primary'
+                  onDelete={handleDelete}
+                  deleteIcon={<DoneIcon />}
+                />
+                <Chip
+                  variant='outlined'
+                  size='small'
+                  icon={<FaceIcon />}
+                  label='Primary clickable'
+                  clickable
+                  color='primary'
+                  onDelete={handleDelete}
+                  deleteIcon={<DoneIcon />}
+                />
+                <Chip variant='outlined' size='small' label='Deletable primary' onDelete={handleDelete} color='primary' />
               </div>
-            </Grid>
-            <Grid item xs={6}>
-              <div className={classes.textFieldContainer}>
-                <TextField type='email' variant='outlined' className={classes.textField} label='Email' fullWidth />
-              </div>
-            </Grid>
-          </Grid>
-          <Grid container spacing={3}>
-            <Grid item xs={6}>
-              <div className={classes.textFieldContainer}>
-                <TextField type='text' variant='outlined' className={classes.textField} label='First Name' fullWidth />
-              </div>
-            </Grid>
-            <Grid item xs={6}>
-              <div className={classes.textFieldContainer}>
-                <TextField type='text' variant='outlined' className={classes.textField} label='Last Name' fullWidth />
-              </div>
-            </Grid>
-          </Grid>
-        </div>
-        <Divider variant='middle' />
-        <Typography variant='h6' className={classes.infoTitle}>
-          Followed Circles
-        </Typography>
-        <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
-          <div className={classes.followedCircles}>
-            <Chip variant='outlined' size='small' label='Basic' />
-            <Chip variant='outlined' size='small' avatar={<Avatar>M</Avatar>} label='Clickable' onClick={handleClick} />
-            <Chip
-              variant='outlined'
-              size='small'
-              avatar={<Avatar alt='Natacha' src='/static/images/avatar/1.jpg' />}
-              label='Deletable'
-              onDelete={handleDelete}
-            />
-            <Chip variant='outlined' size='small' icon={<FaceIcon />} label='Clickable deletable' onClick={handleClick} onDelete={handleDelete} />
-            <Chip
-              variant='outlined'
-              size='small'
-              label='Custom delete icon'
-              onClick={handleClick}
-              onDelete={handleDelete}
-              deleteIcon={<DoneIcon />}
-            />
-            <Chip variant='outlined' size='small' label='Clickable link' component='a' href='#chip' clickable />
-            <Chip
-              variant='outlined'
-              size='small'
-              avatar={<Avatar>M</Avatar>}
-              label='Primary clickable'
-              clickable
-              color='primary'
-              onDelete={handleDelete}
-              deleteIcon={<DoneIcon />}
-            />
-            <Chip
-              variant='outlined'
-              size='small'
-              icon={<FaceIcon />}
-              label='Primary clickable'
-              clickable
-              color='primary'
-              onDelete={handleDelete}
-              deleteIcon={<DoneIcon />}
-            />
-            <Chip variant='outlined' size='small' label='Deletable primary' onDelete={handleDelete} color='primary' />
-          </div>
-        </div>
-      </Card>
+            </div>
+          </Card>
+        </>
+      )}
     </>
   );
 }

@@ -88,18 +88,7 @@ const theme = createMuiTheme({
   },
 });
 
-const login = async (
-  username,
-  password,
-  rememberMe,
-  setMissingRequired,
-  setLoggedIn,
-  setLoading,
-  setAlertOpen,
-  setAlertMessage,
-  history,
-  setUser
-) => {
+const login = async (username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history) => {
   localStorage.setItem('username', rememberMe && username.length !== 0 ? username : '');
   localStorage.setItem('rememberMe', rememberMe);
 
@@ -130,25 +119,20 @@ const login = async (
       headers
     );
     setLoading(false);
-    setLoggedIn(true);
-    setUser(username);
+    localStorage.setItem('user', username);
     history.push('/');
   } catch (err) {
     setAlertOpen(true);
-    setAlertMessage(err.response.data);
+    setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
     setLoading(false);
     return;
   }
 };
 
 export default function Login(props) {
-  // turn off search field for login page
   props.setShowSearchField(false);
   props.setShowLoginButton(false);
-
   const history = useHistory();
-
-  // styles
   const classes = useStyles();
 
   // hooks
@@ -169,9 +153,7 @@ export default function Login(props) {
   const changeRememberMe = (e) => setRememberMe(e.target.checked);
 
   useEffect(() => {
-    if (localStorage.getItem('rememberMe')) {
-      setUsername(localStorage.getItem('username'));
-    }
+    if (localStorage.getItem('rememberMe')) setUsername(localStorage.getItem('username'));
   }, []);
 
   const handleAlertClose = (event, reason) => {
@@ -236,18 +218,7 @@ export default function Login(props) {
             error={missingRequired && password === ''}
             onKeyPress={(event) => {
               if (event.key === 'Enter')
-                login(
-                  username,
-                  password,
-                  rememberMe,
-                  setMissingRequired,
-                  props.setLoggedIn,
-                  setLoading,
-                  setAlertOpen,
-                  setAlertMessage,
-                  history,
-                  props.setUser
-                );
+                login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history);
             }}
             InputProps={{
               startAdornment: (
@@ -281,20 +252,7 @@ export default function Login(props) {
           <Button
             variant='outlined'
             color='primary'
-            onClick={() =>
-              login(
-                username,
-                password,
-                rememberMe,
-                setMissingRequired,
-                props.setLoggedIn,
-                setLoading,
-                setAlertOpen,
-                setAlertMessage,
-                history,
-                props.setUser
-              )
-            }
+            onClick={() => login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history)}
             classes={{
               root: classes.button,
               label: classes.buttonLabel,

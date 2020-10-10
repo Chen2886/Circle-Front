@@ -1,6 +1,6 @@
 import './App.css';
 import logo from './resources/logo.png';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Helmet from 'react-helmet';
@@ -118,9 +118,12 @@ export default function App(props) {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
   const [showLoginButton, setShowLoginButton] = React.useState(true);
-  const [loggedIn, setLoggedIn] = React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [user, setUser] = React.useState('');
+  const [currentUser, setCurrentUser] = React.useState('');
+
+  useEffect(() => {
+    setCurrentUser(localStorage.getItem('user'));
+  });
 
   const toggleDrawer = (open) => (event) => {
     // if (
@@ -131,8 +134,6 @@ export default function App(props) {
     // }
     setDrawerOpen(open);
   };
-
-  // const img = <img src={logo} className={classes.pic} alt='logo' style={{ marginLeft: "15px", objectFit: "scale-down"}} />;
 
   return (
     <ThemeProvider theme={theme}>
@@ -205,16 +206,16 @@ export default function App(props) {
                   </Grid>
                   <Grid xs={3} item></Grid>
                   <Grid xs={1} item>
-                    {showLoginButton && !loggedIn && (
+                    {showLoginButton && (currentUser === null || currentUser === '') && (
                       <div align='right'>
                         <Button color='inherit' component={Link} to='/login'>
                           Login
                         </Button>
                       </div>
                     )}
-                    {showLoginButton && loggedIn && (
+                    {showLoginButton && currentUser !== null && currentUser !== '' && (
                       <div align='right'>
-                        <IconButton color='inherit' component={Link} to='/profile'>
+                        <IconButton color='inherit' component={Link} to={'/profile/' + currentUser}>
                           <AccountCircleIcon />
                         </IconButton>
                       </div>
@@ -226,11 +227,7 @@ export default function App(props) {
           </div>
         </div>
         <Switch>
-          <Route
-            exact
-            path='/login'
-            component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setLoggedIn={setLoggedIn} setUser={setUser} />}
-          />
+          <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
@@ -242,8 +239,8 @@ export default function App(props) {
           />
           <Route
             exact
-            path='/profile'
-            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} user={user} setLoggedIn={setLoggedIn} />}
+            path='/profile/:requestedUser'
+            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} currentUser={currentUser} />}
           />
         </Switch>
       </Router>
