@@ -3,9 +3,24 @@ import Alert from './Alert.js';
 import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory, useParams } from 'react-router-dom';
-import { Grid, Button, Typography, Card, TextField, Divider, Chip, Avatar, Snackbar } from '@material-ui/core';
+import {
+  Grid,
+  Button,
+  Typography,
+  Card,
+  TextField,
+  Divider,
+  Chip,
+  Avatar,
+  Snackbar,
+  Backdrop,
+  CircularProgress,
+  CardHeader,
+  IconButton,
+} from '@material-ui/core';
 import FaceIcon from '@material-ui/icons/Face';
 import DoneIcon from '@material-ui/icons/Done';
+import EditIcon from '@material-ui/icons/Edit';
 import axios from 'axios';
 
 const font = "'Tenor Sans', sans-serif";
@@ -15,10 +30,10 @@ const useStyles = makeStyles((theme) => ({
     margin: '2rem',
     display: 'flex',
     boxShadow: '0px 10px 13px -7px #000000, 0px 0px 8px 0px rgba(0,0,0,0)',
-    width: '60%',
   },
   settingsCard: {
-    width: '40%',
+    margin: '2rem',
+    boxShadow: '0px 10px 13px -7px #000000, 0px 0px 8px 0px rgba(0,0,0,0)',
   },
   infoCard: {
     margin: '2rem',
@@ -43,14 +58,19 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     overflow: 'auto',
   },
+  settingsContainer: {
+    textAlign: 'center',
+    alignContent: 'center',
+    paddingBottom: '2rem',
+    overflow: 'auto',
+  },
   flexDisplay: {
     display: 'flex',
   },
   infoTitle: {
     margin: '1rem',
-    marginTop: '3rem',
+    marginTop: '2rem',
     textAlign: 'center',
-    width: '100%',
   },
   gridContainer: {
     flexGrow: 1,
@@ -63,6 +83,10 @@ const useStyles = makeStyles((theme) => ({
     overflow: 'auto',
     width: '60%',
   },
+  settingsTextField: {
+    marginTop: '5px',
+    width: '70%',
+  },
   textFieldContainer: {
     overflow: 'auto',
     margin: '0.5rem',
@@ -72,7 +96,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'center',
     flexWrap: 'wrap',
-    // width: '60%',
     marginBottom: '1rem',
     '& > *': {
       margin: theme.spacing(0.5),
@@ -87,24 +110,12 @@ const useStyles = makeStyles((theme) => ({
     borderColor: '#528487',
     float: 'right',
   },
+  editUserButton: {
+    // marginTop: '1rem',
+    marginTop: '2rem',
+    textAlign: 'center',
+  },
 }));
-
-const bioFocus = (setBio, e) => {
-  console.log(e.target.value);
-};
-
-const bioBlur = (setBio, e) => {
-  console.log(e.target.value);
-  setBio(e.target.value);
-};
-
-const handleClick = () => {
-  console.info('You clicked the Chip.');
-};
-
-const handleDelete = () => {
-  console.info('You clicked the delete icon.');
-};
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -120,20 +131,65 @@ export default function Profile(props) {
   props.setShowLoginButton(true);
   const history = useHistory();
   const classes = useStyles();
+  const currentUser = props.currentUser;
   let { requestedUser } = useParams();
   const [bio, setBio] = React.useState('');
+  const [lastUpdatedBio, setLastUpdatedBio] = React.useState('');
   const [requestedUserObj, setRequestedUserObj] = React.useState({});
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
   const [userError, setUserError] = React.useState(false);
+  const [alertSeverity, setAlertSeverity] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [email, setEmail] = React.useState('');
+  const [lastUpdatedEmail, setLastUpdatedEmail] = React.useState('');
+  const [editingUserInfo, setEditingUserInfo] = React.useState(false);
 
   // if url does not include requested user
   if (requestedUser === null || requestedUser === '') history.push('/');
 
+  const bioChanged = (e) => setBio(e.target.value);
+  const handleEmailChanged = (e) => setEmail(e.target.value);
+
   // initialize the user
   useEffect(() => getUser(requestedUser), []);
 
+  const editUserInfo = async (e) => {
+    if (editingUserInfo) {
+      // not valid email
+      if (!/[^@]*@[^.]*\..+/.test(email)) {
+        setAlertSeverity('error');
+        setAlertMessage('Email invalid');
+        setAlertOpen(true);
+        return;
+      }
+      setLoading(true);
+      var newEmail = e.target.value;
+      if (email === lastUpdatedEmail) return;
+      var data = {
+        username: currentUser,
+        email: email,
+      };
+      console.log(data);
+      try {
+        await axios.put('https://cs307circle-production.herokuapp.com/api/updateUserEmail', data, headers);
+        setAlertSeverity('success');
+        setAlertMessage('Email updated!');
+        setAlertOpen(true);
+        setLastUpdatedEmail(newEmail);
+      } catch (err) {
+        setAlertSeverity('error');
+        setAlertMessage(err.response.data);
+        setAlertOpen(true);
+        setEmail(lastUpdatedEmail);
+      }
+    }
+    setLoading(false);
+    setEditingUserInfo(!editingUserInfo);
+  };
+
   const getUser = (requestedUser) => {
+    setLoading(true);
     axios
       .get(
         'https://cs307circle-production.herokuapp.com/api/getUser',
@@ -143,14 +199,19 @@ export default function Profile(props) {
         headers
       )
       .then(function (res) {
-        console.log(res);
         setRequestedUserObj(res.data);
+        setBio(res.data.bio);
+        setEmail(res.data.email);
+        setLastUpdatedBio(res.data.bio);
+        setLastUpdatedEmail(res.data.email);
+        setLoading(false);
       })
       .catch(function (err) {
-        console.log(err);
-        setAlertOpen(true);
+        setAlertSeverity('error');
         setAlertMessage(err.response.data);
         setUserError(true);
+        setAlertOpen(true);
+        setLoading(false);
       });
   };
 
@@ -159,89 +220,132 @@ export default function Profile(props) {
     setAlertOpen(false);
   };
 
+  const bioBlur = async (e) => {
+    var newBio = e.target.value;
+    if (newBio === lastUpdatedBio) return;
+    var data = {
+      username: currentUser,
+      bio: newBio,
+    };
+    try {
+      await axios.put('https://cs307circle-production.herokuapp.com/api/updateUserBio', data, headers);
+      setAlertSeverity('success');
+      setAlertMessage('Bio updated!');
+      setAlertOpen(true);
+      setLastUpdatedBio(newBio);
+    } catch (err) {
+      setAlertSeverity('error');
+      setAlertMessage('Could not update Bio. Please try again later.');
+      setAlertOpen(true);
+    }
+  };
+
+  const handleClick = () => {
+    console.info('You clicked the Chip.');
+  };
+  
+  const handleDelete = () => {
+    console.info('You clicked the delete icon.');
+  };
+
   return (
     <>
+      <Backdrop className={classes.backdrop} open={loading} onClick={() => setLoading(false)}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={handleAlertClose} severity={alertSeverity}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
       {userError && <div>User does not exist!</div>}
       {!userError && (
         <>
-          <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-            <Alert onClose={handleAlertClose} severity='error'>
-              {alertMessage}
-            </Alert>
-          </Snackbar>
-          <Card className={classes.avatarCard}>
-            <div className={classes.avatarContainer}>
-              <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} />
-            </div>
-            <div className={classes.infoContainer}>
-              <div className={classes.flexDisplay}>
-                <Typography variant='h4' style={{ float: 'left' }}>
-                  {requestedUserObj === null ? '' : requestedUserObj.username}
-                </Typography>
-                <Button
-                  variant='outlined'
-                  style={{ marginLeft: '1rem' }}
-                  classes={{
-                    root: classes.button,
-                    label: classes.buttonLabel,
-                  }}>
-                  Logout
-                </Button>
-              </div>
-              <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
-                <Typography variant='h6' style={{ float: 'left' }}>
-                  22 Friends
-                </Typography>
-                <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
-                  89 Comment
-                </Typography>
-              </div>
-              <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
-                <TextField
-                  label='Bio'
-                  fullWidth
-                  multiline
-                  rows={4}
-                  defaultValue={bio}
-                  onFocus={(e) => bioFocus(setBio, e)}
-                  onBlur={(e) => bioBlur(setBio, e)}
-                  variant='outlined'
-                />
-              </div>
-            </div>
-          </Card>
+          <Grid container>
+            <Grid item xs={requestedUser === currentUser ? 8 : 12}>
+              <Card className={classes.avatarCard}>
+                <div className={classes.avatarContainer}>
+                  <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} />
+                </div>
+                <div className={classes.infoContainer}>
+                  <div className={classes.flexDisplay}>
+                    <Typography variant='h4' style={{ float: 'left' }}>
+                      {requestedUserObj === null ? '' : requestedUserObj.username}
+                    </Typography>
+                    {requestedUser !== currentUser && (
+                      <Button
+                        variant='outlined'
+                        style={{ marginLeft: '1rem' }}
+                        classes={{
+                          root: classes.button,
+                          label: classes.buttonLabel,
+                        }}>
+                        CONNECT
+                      </Button>
+                    )}
+                  </div>
+                  <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
+                    <Typography variant='h6' style={{ float: 'left' }}>
+                      {requestedUserObj === undefined || requestedUserObj.listOfFollowers === undefined ? 0 : requestedUserObj.listOfFollowers.length}{' '}
+                      Followers
+                    </Typography>
+                    <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
+                      {requestedUserObj === undefined || requestedUserObj.listOfFollowing === undefined ? 0 : requestedUserObj.listOfFollowing.length}{' '}
+                      Following
+                    </Typography>
+                    <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
+                      {requestedUserObj === undefined || requestedUserObj.listOfTopics === undefined ? 0 : requestedUserObj.listOfTopics.length}{' '}
+                      CIRCLES
+                    </Typography>
+                  </div>
+                  <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
+                    <TextField label='Bio' key='Bio' fullWidth multiline rows={4} value={bio} onChange={bioChanged} onBlur={(e) => bioBlur(e)} />
+                  </div>
+                </div>
+              </Card>
+            </Grid>
+            {requestedUser === currentUser && (
+              <Grid item xs={4}>
+                <Card className={classes.settingsCard}>
+                  <CardHeader
+                    action={
+                      <IconButton aria-label='settings' onClick={editUserInfo}>
+                        {editingUserInfo && <DoneIcon />}
+                        {!editingUserInfo && <EditIcon />}
+                      </IconButton>
+                    }
+                    title='User Information'
+                  />
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div className={classes.settingsContainer}>
+                      <TextField
+                        type='text'
+                        variant='outlined'
+                        className={classes.settingsTextField}
+                        label='Username'
+                        value={requestedUser}
+                        disabled
+                        fullWidth
+                      />
+                    </div>
+                    <div className={classes.settingsContainer}>
+                      <TextField
+                        type='email'
+                        variant='outlined'
+                        className={classes.settingsTextField}
+                        label='Email'
+                        value={email}
+                        onChange={(e) => handleEmailChanged(e)}
+                        disabled={!editingUserInfo}
+                        fullWidth
+                      />
+                    </div>
+                  </div>
+                </Card>
+              </Grid>
+            )}
+          </Grid>
           <Card className={classes.infoCard}>
-            <div className={classes.gridContainer}>
-              <Grid container>
-                <Typography variant='h6' className={classes.infoTitle}>
-                  User information
-                </Typography>
-              </Grid>
-              <Grid container spacing={3}>
-                <Grid item xs={6}>
-                  <div className={classes.flexDisplay}>
-                    <TextField type='text' variant='outlined' className={classes.textField} label='Username' fullWidth />
-                  </div>
-                </Grid>
-                <Grid item xs={6}>
-                  <div className={classes.flexDisplay}>
-                    <TextField type='email' variant='outlined' className={classes.textField} label='Email' fullWidth />
-                  </div>
-                </Grid>
-              </Grid>
-              <Grid container spacing={3}>
-                <Grid item xs={6}>
-                  <div className={classes.flexDisplay}>
-                    <TextField type='text' variant='outlined' className={classes.textField} label='First Name' fullWidth />
-                  </div>
-                </Grid>
-                <Grid item xs={6}>
-                  <div className={classes.flexDisplay}>
-                    <TextField type='text' variant='outlined' className={classes.textField} label='Last Name' fullWidth />
-                  </div>
-                </Grid>
-              </Grid>
-            </div>
             <Divider variant='middle' />
             <Typography variant='h6' className={classes.infoTitle}>
               Followed Circles
