@@ -2,7 +2,7 @@ import './App.css';
 import Alert from './Alert.js';
 import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, Redirect } from 'react-router-dom';
 import {
   Grid,
   Button,
@@ -18,7 +18,6 @@ import {
   CardHeader,
   IconButton,
 } from '@material-ui/core';
-import FaceIcon from '@material-ui/icons/Face';
 import DoneIcon from '@material-ui/icons/Done';
 import EditIcon from '@material-ui/icons/Edit';
 import axios from 'axios';
@@ -115,6 +114,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '2rem',
     textAlign: 'center',
   },
+  chipLabel: {
+    fontSize: '20px'
+  },
 }));
 
 const headers = {
@@ -142,9 +144,10 @@ export default function Profile(props) {
   const [email, setEmail] = React.useState('');
   const [lastUpdatedEmail, setLastUpdatedEmail] = React.useState('');
   const [editingUserInfo, setEditingUserInfo] = React.useState(false);
+  const [circles, setCircles] = React.useState([]);
 
   // if url does not include requested user
-  if (requestedUser === null || requestedUser === '') history.push('/');
+  if (requestedUser === null || requestedUser === '') history.push('/404');
 
   const bioChanged = (e) => setBio(e.target.value);
   const handleEmailChanged = (e) => setEmail(e.target.value);
@@ -154,7 +157,7 @@ export default function Profile(props) {
     function setAppBar() {
       props.setShowSearchField(false);
       props.setShowLoginButton(true);
-    };
+    }
     setAppBar();
     getUser(requestedUser);
   }, [props, requestedUser]);
@@ -209,6 +212,7 @@ export default function Profile(props) {
         setEmail(res.data.email);
         setLastUpdatedBio(res.data.bio);
         setLastUpdatedEmail(res.data.email);
+        setCircles(res.data.listOfTopics);
         setLoading(false);
       })
       .catch(function (err) {
@@ -245,14 +249,6 @@ export default function Profile(props) {
     }
   };
 
-  const handleClick = () => {
-    console.info('You clicked the Chip.');
-  };
-  
-  const handleDelete = () => {
-    console.info('You clicked the delete icon.');
-  };
-
   return (
     <>
       <Backdrop className={classes.backdrop} open={loading} onClick={() => setLoading(false)}>
@@ -263,11 +259,11 @@ export default function Profile(props) {
           {alertMessage}
         </Alert>
       </Snackbar>
-      {userError && <div>User does not exist!</div>}
+      {userError && <Redirect to='/404'></Redirect>}
       {!userError && (
         <>
           <Grid container>
-            <Grid item xs={requestedUser === currentUser ? 8 : 12}>
+            <Grid item xs={12} md={requestedUser === currentUser ? 8 : 12}>
               <Card className={classes.avatarCard}>
                 <div className={classes.avatarContainer}>
                   <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} alt='avatar' />
@@ -310,7 +306,7 @@ export default function Profile(props) {
               </Card>
             </Grid>
             {requestedUser === currentUser && (
-              <Grid item xs={4}>
+              <Grid item xs={12} md={4}>
                 <Card className={classes.settingsCard}>
                   <CardHeader
                     action={
@@ -357,46 +353,19 @@ export default function Profile(props) {
             </Typography>
             <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
               <div className={classes.followedCircles}>
-                <Chip variant='outlined' size='small' label='Basic' />
-                <Chip variant='outlined' size='small' avatar={<Avatar>M</Avatar>} label='Clickable' onClick={handleClick} />
-                <Chip
-                  variant='outlined'
-                  size='small'
-                  avatar={<Avatar alt='Natacha' src='/static/images/avatar/1.jpg' />}
-                  label='Deletable'
-                  onDelete={handleDelete}
-                />
-                <Chip variant='outlined' size='small' icon={<FaceIcon />} label='Clickable deletable' onClick={handleClick} onDelete={handleDelete} />
-                <Chip
-                  variant='outlined'
-                  size='small'
-                  label='Custom delete icon'
-                  onClick={handleClick}
-                  onDelete={handleDelete}
-                  deleteIcon={<DoneIcon />}
-                />
-                <Chip variant='outlined' size='small' label='Clickable link' component='a' href='#chip' clickable />
-                <Chip
-                  variant='outlined'
-                  size='small'
-                  avatar={<Avatar>M</Avatar>}
-                  label='Primary clickable'
-                  clickable
-                  color='primary'
-                  onDelete={handleDelete}
-                  deleteIcon={<DoneIcon />}
-                />
-                <Chip
-                  variant='outlined'
-                  size='small'
-                  icon={<FaceIcon />}
-                  label='Primary clickable'
-                  clickable
-                  color='primary'
-                  onDelete={handleDelete}
-                  deleteIcon={<DoneIcon />}
-                />
-                <Chip variant='outlined' size='small' label='Deletable primary' onDelete={handleDelete} color='primary' />
+                {circles.map((circle) => (
+                  <Chip
+                    classes={{
+                      label: classes.chipLabel
+                    }}
+                    key={circle}
+                    variant='outlined'
+                    avatar={<Avatar>{circle.charAt(0)}</Avatar>}
+                    size='medium'
+                    color='primary'
+                    label={circle}
+                  />
+                ))}
               </div>
             </div>
           </Card>

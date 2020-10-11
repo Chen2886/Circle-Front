@@ -32,6 +32,7 @@ import Main from './Main.js';
 import Profile from './Profile.js';
 import CreateAccount from './createAccount.js';
 import Post from './Post.js';
+import Page404 from './404.js'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -286,6 +287,7 @@ export default function App(props) {
             path='/profile/:requestedUser'
             component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} currentUser={currentUser} />}
           />
+          <Route exact path='/404' component={() => <Page404></Page404>}/>
         </Switch>
       </Router>
     </ThemeProvider>
