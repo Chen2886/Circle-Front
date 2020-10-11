@@ -88,8 +88,8 @@ const theme = createMuiTheme({
   },
 });
 
-const login = async (username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history) => {
-  localStorage.setItem('username', rememberMe && username.length !== 0 ? username : '');
+const login = async (username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history, setIsLoggedIn) => {
+  localStorage.setItem('username', username);
   localStorage.setItem('rememberMe', rememberMe);
 
   // if any fields are empty
@@ -111,7 +111,7 @@ const login = async (username, password, rememberMe, setMissingRequired, setLoad
   // show loading
   setLoading(true);
   try {
-    let res = await axios.get(
+    await axios.get(
       'https://cs307circle-production.herokuapp.com/api/login',
       {
         params: data,
@@ -121,6 +121,7 @@ const login = async (username, password, rememberMe, setMissingRequired, setLoad
     setLoading(false);
     localStorage.setItem('user', username);
     history.push('/');
+    setIsLoggedIn(true);
   } catch (err) {
     setAlertOpen(true);
     setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
@@ -130,36 +131,34 @@ const login = async (username, password, rememberMe, setMissingRequired, setLoad
 };
 
 export default function Login(props) {
-  props.setShowSearchField(false);
-  props.setShowLoginButton(false);
+  // Add history and styles
+  // Get requested user from URL param
+  // Hooks
+  // textfield changes
   const history = useHistory();
   const classes = useStyles();
-
-  // hooks
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [missingRequired, setMissingRequired] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(true);
-
-  // backdrop loading
   const [loading, setLoading] = React.useState(false);
-
-  // alert hook
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
-
   const passwordChanged = (e) => setPassword(e.target.value);
   const usernameChanged = (e) => setUsername(e.target.value);
   const changeRememberMe = (e) => setRememberMe(e.target.checked);
 
   useEffect(() => {
-    if (localStorage.getItem('rememberMe')) setUsername(localStorage.getItem('username'));
-  }, []);
+    function setAppBar() {
+      props.setShowSearchField(false);
+      props.setShowLoginButton(true);
+    }
+    setAppBar();
+    setUsername(localStorage.getItem('username'));
+  }, [setUsername, props]);
 
   const handleAlertClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setAlertOpen(false);
   };
 
@@ -218,7 +217,7 @@ export default function Login(props) {
             error={missingRequired && password === ''}
             onKeyPress={(event) => {
               if (event.key === 'Enter')
-                login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history);
+                login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history, props.setIsLoggedIn);
             }}
             InputProps={{
               startAdornment: (
@@ -252,7 +251,9 @@ export default function Login(props) {
           <Button
             variant='outlined'
             color='primary'
-            onClick={() => login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history)}
+            onClick={() =>
+              login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history, props.setIsLoggedIn)
+            }
             classes={{
               root: classes.button,
               label: classes.buttonLabel,

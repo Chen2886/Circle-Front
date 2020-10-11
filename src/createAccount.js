@@ -1,8 +1,8 @@
 import './App.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { InputAdornment, TextField, Button, Container, Backdrop, CircularProgress, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Redirect, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -151,37 +151,26 @@ function Alert(props) {
 }
 
 export default function CreateAccountPage(props) {
-  // turn off search field for login page
-  props.setShowSearchField(false);
-  props.setShowLoginButton(false);
-
-  // styles
-  const classes = useStyles();
-
+  // Add history and styles
+  // Get requested user from URL param
+  // Hooks
   const history = useHistory();
-
-  // information
+  const classes = useStyles();
   const [password, setPassword] = React.useState('');
   const [retypePassword, setRetypePassword] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [email, setEmail] = React.useState('');
-
-  // empty validation
   const [missingRequired, setMissingRequired] = React.useState(false);
-
   const [emailValid, setEmailValid] = React.useState(false);
-  // password validation
   const [passwordLength, setPasswordLength] = React.useState(false);
   const [passwordLower, setPasswordLower] = React.useState(false);
   const [passwordUpper, setPasswordUpper] = React.useState(false);
-
-  // backdrop loading
   const [loading, setLoading] = React.useState(false);
-
-  // alert hook
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
 
+  const usernameChanged = (e) => setUsername(e.target.value);
+  const retypePasswordChanged = (e) => setRetypePassword(e.target.value);
   const passwordChanged = (e) => {
     var pass = e.target.value;
     setPassword(pass);
@@ -198,19 +187,27 @@ export default function CreateAccountPage(props) {
     if (/[A-Z]/.test(pass)) setPasswordUpper(true);
     else setPasswordUpper(false);
   };
+
   const handleAlertClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setAlertOpen(false);
   };
-  const usernameChanged = (e) => setUsername(e.target.value);
+
   const emailChanged = (e) => {
     if (/[^@]*@[^.]*\..+/.test(e.target.value)) setEmailValid(true);
     else setEmailValid(false);
     setEmail(e.target.value);
   };
-  const retypePasswordChanged = (e) => setRetypePassword(e.target.value);
+
+  useEffect(() => {
+    function setAppBar() {
+      props.setShowSearchField(false);
+      props.setShowLoginButton(true);
+    }
+    setAppBar();
+  }, [props]);
 
   return (
     <MuiThemeProvider theme={theme}>

@@ -6,7 +6,21 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Helmet from 'react-helmet';
 
 import { ThemeProvider } from '@material-ui/styles';
-import { Grid, InputBase, AppBar, Button, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText } from '@material-ui/core';
+import {
+  Grid,
+  InputBase,
+  AppBar,
+  Button,
+  Toolbar,
+  IconButton,
+  Typography,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  Menu,
+  MenuItem,
+} from '@material-ui/core';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
@@ -120,10 +134,30 @@ export default function App(props) {
   const [showLoginButton, setShowLoginButton] = React.useState(true);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [currentUser, setCurrentUser] = React.useState('');
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  window.onbeforeunload = () => {
+    if (localStorage.getItem('rememberMe') !== 'true') localStorage.removeItem('user');
+  };
+
+  // user menu
+  const handleOpenUserMenu = (event) => setAnchorEl(event.currentTarget);
+  const handleCloseUserMenu = () => setAnchorEl(null);
+  const handleRedirectToProfilePage = () => {
+    setAnchorEl(null);
+  };
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setCurrentUser(localStorage.getItem('user'));
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
+    // this forces rerender
+    setIsLoggedIn(false);
     setCurrentUser(localStorage.getItem('user'));
-  });
+  }, [isLoggedIn]);
 
   const toggleDrawer = (open) => (event) => {
     // if (
@@ -215,7 +249,7 @@ export default function App(props) {
                     )}
                     {showLoginButton && currentUser !== null && currentUser !== '' && (
                       <div align='right'>
-                        <IconButton color='inherit' component={Link} to={'/profile/' + currentUser}>
+                        <IconButton color='inherit' onClick={handleOpenUserMenu}>
                           <AccountCircleIcon />
                         </IconButton>
                       </div>
@@ -224,12 +258,22 @@ export default function App(props) {
                 </Grid>
               </Toolbar>
             </AppBar>
+            <Menu id='simple-menu' anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleCloseUserMenu}>
+              <MenuItem onClick={handleRedirectToProfilePage} component={Link} to={'/profile/' + currentUser}>
+                Profile
+              </MenuItem>
+              <MenuItem onClick={handleLogout} component={Link} to='/'>
+                Logout
+              </MenuItem>
+            </Menu>
           </div>
         </div>
         <Switch>
-          <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
-          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
-          <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
+          <Route
+            exact
+            path='/login'
+            component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />}
+          />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route exact path='/newPost' component={() => <Post />} />
           <Route
