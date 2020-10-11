@@ -130,13 +130,10 @@ const login = async (username, password, rememberMe, setMissingRequired, setLoad
 };
 
 export default function Login(props) {
-  // Disable search and login
   // Add history and styles
   // Get requested user from URL param
   // Hooks
   // textfield changes
-  props.setShowSearchField(false);
-  props.setShowLoginButton(false);
   const history = useHistory();
   const classes = useStyles();
   const [password, setPassword] = React.useState('');
@@ -151,9 +148,13 @@ export default function Login(props) {
   const changeRememberMe = (e) => setRememberMe(e.target.checked);
 
   useEffect(() => {
+    function setAppBar() {
+      props.setShowSearchField(false);
+      props.setShowLoginButton(true);
+    };
+    setAppBar();
     setUsername(localStorage.getItem('username'));
-    console.log(localStorage.getItem('username'));
-  }, []);
+  }, [setUsername, props]);
 
   const handleAlertClose = (event, reason) => {
     if (reason === 'clickaway') return;

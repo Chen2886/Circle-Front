@@ -1,5 +1,5 @@
 import './App.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { InputAdornment, TextField, Button, Container, Backdrop, CircularProgress, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { useHistory } from 'react-router-dom';
@@ -151,12 +151,9 @@ function Alert(props) {
 }
 
 export default function CreateAccountPage(props) {
-  // Disable search and login
   // Add history and styles
   // Get requested user from URL param
   // Hooks
-  props.setShowSearchField(false);
-  props.setShowLoginButton(false);
   const history = useHistory();
   const classes = useStyles();
   const [password, setPassword] = React.useState('');
@@ -203,6 +200,14 @@ export default function CreateAccountPage(props) {
     else setEmailValid(false);
     setEmail(e.target.value);
   };
+
+  useEffect(() => {
+    function setAppBar() {
+      props.setShowSearchField(false);
+      props.setShowLoginButton(true);
+    }
+    setAppBar();
+  }, [props]);
 
   return (
     <MuiThemeProvider theme={theme}>
