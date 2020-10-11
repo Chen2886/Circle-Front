@@ -2,7 +2,7 @@ import './App.css';
 import logo from './resources/logo.png';
 import React, { useEffect } from 'react';
 
-import { BrowserRouter as Router, Switch, Route, Link, useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Helmet from 'react-helmet';
 
 import { ThemeProvider } from '@material-ui/styles';
@@ -136,10 +136,6 @@ export default function App(props) {
   const [currentUser, setCurrentUser] = React.useState('');
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  window.onload = () => {
-    console.log(localStorage);
-  };
-
   window.onbeforeunload = () => {
     if (localStorage.getItem('rememberMe') !== 'true') localStorage.removeItem('user');
   };
@@ -156,7 +152,7 @@ export default function App(props) {
     setAnchorEl(null);
   };
 
-  useEffect(() => setCurrentUser(localStorage.getItem('user')));
+  useEffect(() => setCurrentUser(localStorage.getItem('user')), [setCurrentUser]);
 
   const toggleDrawer = (open) => (event) => {
     // if (

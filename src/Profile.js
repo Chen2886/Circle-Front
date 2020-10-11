@@ -127,8 +127,6 @@ export default function Profile(props) {
   // Add history and styles
   // Get requested user from URL param
   // Hooks
-  props.setShowSearchField(true);
-  props.setShowLoginButton(true);
   const history = useHistory();
   const classes = useStyles();
   const currentUser = props.currentUser;
@@ -152,7 +150,14 @@ export default function Profile(props) {
   const handleEmailChanged = (e) => setEmail(e.target.value);
 
   // initialize the user
-  useEffect(() => getUser(requestedUser), []);
+  useEffect(() => {
+    function setAppBar() {
+      props.setShowSearchField(false);
+      props.setShowLoginButton(true);
+    };
+    setAppBar();
+    getUser(requestedUser);
+  }, [props, requestedUser]);
 
   const editUserInfo = async (e) => {
     if (editingUserInfo) {
@@ -265,7 +270,7 @@ export default function Profile(props) {
             <Grid item xs={requestedUser === currentUser ? 8 : 12}>
               <Card className={classes.avatarCard}>
                 <div className={classes.avatarContainer}>
-                  <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} />
+                  <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} alt='avatar' />
                 </div>
                 <div className={classes.infoContainer}>
                   <div className={classes.flexDisplay}>

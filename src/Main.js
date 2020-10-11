@@ -1,6 +1,6 @@
 import "./App.css";
 import React from "react";
-import { Fab, Avatar } from "@material-ui/core";
+import { Fab } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import PeopleIcon from '@material-ui/icons/People';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
