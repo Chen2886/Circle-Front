@@ -88,7 +88,7 @@ const theme = createMuiTheme({
   },
 });
 
-const login = async (username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history) => {
+const login = async (username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history, setIsLoggedIn) => {
   localStorage.setItem('username', username);
   localStorage.setItem('rememberMe', rememberMe);
 
@@ -121,6 +121,7 @@ const login = async (username, password, rememberMe, setMissingRequired, setLoad
     setLoading(false);
     localStorage.setItem('user', username);
     history.push('/');
+    setIsLoggedIn(true);
   } catch (err) {
     setAlertOpen(true);
     setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
@@ -151,7 +152,7 @@ export default function Login(props) {
     function setAppBar() {
       props.setShowSearchField(false);
       props.setShowLoginButton(true);
-    };
+    }
     setAppBar();
     setUsername(localStorage.getItem('username'));
   }, [setUsername, props]);
@@ -216,7 +217,7 @@ export default function Login(props) {
             error={missingRequired && password === ''}
             onKeyPress={(event) => {
               if (event.key === 'Enter')
-                login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history);
+                login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history, props.setIsLoggedIn);
             }}
             InputProps={{
               startAdornment: (
@@ -250,7 +251,9 @@ export default function Login(props) {
           <Button
             variant='outlined'
             color='primary'
-            onClick={() => login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history)}
+            onClick={() =>
+              login(username, password, rememberMe, setMissingRequired, setLoading, setAlertOpen, setAlertMessage, history, props.setIsLoggedIn)
+            }
             classes={{
               root: classes.button,
               label: classes.buttonLabel,

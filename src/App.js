@@ -135,6 +135,7 @@ export default function App(props) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [currentUser, setCurrentUser] = React.useState('');
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
   window.onbeforeunload = () => {
     if (localStorage.getItem('rememberMe') !== 'true') localStorage.removeItem('user');
@@ -152,7 +153,11 @@ export default function App(props) {
     setAnchorEl(null);
   };
 
-  useEffect(() => setCurrentUser(localStorage.getItem('user')), [setCurrentUser]);
+  useEffect(() => {
+    // this forces rerender
+    setIsLoggedIn(false);
+    setCurrentUser(localStorage.getItem('user'));
+  }, [isLoggedIn]);
 
   const toggleDrawer = (open) => (event) => {
     // if (
@@ -264,7 +269,11 @@ export default function App(props) {
           </div>
         </div>
         <Switch>
-          <Route exact path='/login' component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
+          <Route
+            exact
+            path='/login'
+            component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />}
+          />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route exact path='/newPost' component={() => <Post />} />
           <Route
