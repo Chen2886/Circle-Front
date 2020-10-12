@@ -21,6 +21,7 @@ import {
 import DoneIcon from '@material-ui/icons/Done';
 import EditIcon from '@material-ui/icons/Edit';
 import axios from 'axios';
+import Timeline from './Timeline';
 
 const font = "'Tenor Sans', sans-serif";
 
@@ -369,6 +370,7 @@ export default function Profile(props) {
               </div>
             </div>
           </Card>
+          <Timeline user={requestedUser}></Timeline>
         </>
       )}
     </>
