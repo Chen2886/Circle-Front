@@ -136,7 +136,7 @@ export default function Profile(props) {
   let { requestedUser } = useParams();
   const [bio, setBio] = React.useState('');
   const [lastUpdatedBio, setLastUpdatedBio] = React.useState('');
-  const [currentUserObj, setcurrentUserObj] = React.useState({});
+  const [currentUserObj, setCurrentUserObj] = React.useState({});
   const [requestedUserObj, setRequestedUserObj] = React.useState({});
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
@@ -149,7 +149,10 @@ export default function Profile(props) {
   const [circles, setCircles] = React.useState([]);
 
   // if url does not include requested user
-  if (requestedUser === null || requestedUser === '') history.push('/404');
+  if (requestedUser === null || requestedUser === '') {
+    console.log(requestedUser);
+    // history.push('/404');
+  }
 
   const bioChanged = (e) => setBio(e.target.value);
   const handleEmailChanged = (e) => setEmail(e.target.value);
@@ -203,12 +206,13 @@ export default function Profile(props) {
 
   const getRequestedUser = async (requestedUser) => {
     setLoading(true);
-    if (requestedUser === undefined || requestedUser === '') {
+    if (requestedUser === undefined || requestedUser === '' || requestedUser === null) {
       setAlertSeverity('error');
       setAlertMessage('User error. Please try again later.');
       setUserError(true);
       setAlertOpen(true);
       setLoading(false);
+      setRequestedUserObj({});
       return;
     }
     try {
@@ -237,13 +241,9 @@ export default function Profile(props) {
 
   const getcurrentUser = async (currentUser) => {
     setLoading(true);
-    console.log(currentUser === '');
-    if (currentUser === undefined || currentUser === '') {
-      setAlertSeverity('error');
-      setAlertMessage('User error. Please try again later.');
-      setUserError(true);
-      setAlertOpen(true);
+    if (currentUser === undefined || currentUser === '' || currentUser === null) {
       setLoading(false);
+      setCurrentUserObj({});
       return;
     }
     try {
@@ -254,13 +254,10 @@ export default function Profile(props) {
         },
         headers
       );
-      setcurrentUserObj(res.data);
+      setCurrentUserObj(res.data);
       setLoading(false);
     } catch (err) {
-      setAlertSeverity('error');
-      setAlertMessage(err.response.data);
-      setUserError(true);
-      setAlertOpen(true);
+      setCurrentUserObj({});
       setLoading(false);
     }
   };
@@ -341,7 +338,12 @@ export default function Profile(props) {
                     </Typography>
                   </div>
                   <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
-                    <TextField label='Bio' key='Bio' fullWidth multiline rows={4} value={bio} onChange={bioChanged} onBlur={(e) => bioBlur(e)} />
+                    {requestedUser === currentUser && (
+                      <TextField label='Bio' key='Bio' fullWidth multiline rows={4} value={bio} onChange={bioChanged} onBlur={(e) => bioBlur(e)} />
+                    )}
+                    {requestedUser !== currentUser && (
+                      <Typography variant='body1'>{requestedUserObj.bio}</Typography>
+                    )}
                   </div>
                 </div>
               </Card>
