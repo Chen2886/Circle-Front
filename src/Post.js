@@ -1,111 +1,115 @@
 import './App.css';
 import React from 'react';
-import CommentIcon from '@material-ui/icons/Comment';
+import { Typography, Card, CardHeader, Avatar, IconButton, CardMedia, CardContent, CardActions, Divider } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import MmsIcon from '@material-ui/icons/Mms';
-import { Paper, Typography, TextField, Tabs, Tab, Box, Card, CardActionArea, CardContent, CardActions, Button, Grid } from '@material-ui/core';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import { makeStyles } from '@material-ui/core/styles';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import CommentIcon from '@material-ui/icons/Comment';
+import { red } from '@material-ui/core/colors';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Collapse from '@material-ui/core/Collapse';
+import clsx from 'clsx';
 
-export default function Post() {
-  const history = useHistory();
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+  },
+  media: {
+    height: 0,
+    paddingTop: '56.25%', // 16:9
+  },
+  expand: {
+    transform: 'rotate(0deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)',
+  },
+  avatar: {
+    backgroundColor: red[500],
+  },
+}));
 
-  const handleCancel = () => {
-    history.push('/');
-  };
+export default function Login() {
+  // Add history and styles
+  // Get requested user from URL param
+  // Hooks
+  // textfield changes
+  const classes = useStyles();
+  const [expanded, setExpanded] = React.useState(false);
 
-  const handlePost = () => {
-    history.push('/');
-  };
-
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
   };
 
   return (
-    <Grid container>
-      {/* Empty grid to align items.*/}
-      <Grid item xs={4}></Grid>
-      <Grid item xs={4}>
-        <Box m={2}>
-          <Paper elevation={0}>
-            <Typography variant='h4' align='left'>
-              create a post
-            </Typography>
-          </Paper>
-        </Box>
-        <form noValidate autoComplete='off'>
-          <TextField id='outlined-basic' label='Select Circle' variant='outlined' />
-          <Tabs variant='fullWidth' value={value} onChange={handleChange}>
-            <Tab icon={<CommentIcon />} label='Text' />
-            <Tab icon={<MmsIcon />} label='Picture / Video' />
-          </Tabs>
-          {value === 0 && (
-            <Box p={3}>
-              <Card>
-                <CardActionArea>
-                  <CardContent>
-                    <TextField id='standard-basic' label='add title...' fullWidth />
-                    <TextField
-                      id='filled-multiline-static'
-                      label='write something nice...'
-                      multiline
-                      fullWidth
-                      rows={4}
-                      //defaultValue="Default Value"
-                      variant='filled'
-                    />
-                  </CardContent>
-                </CardActionArea>
-                <CardActions>
-                  <Button size='small' color='primary' onClick={handlePost}>
-                    Post
-                  </Button>
-                  <Button size='small' color='primary' onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                </CardActions>
-              </Card>
-            </Box>
-          )}
-          {value === 1 && (
-            <Box p={3}>
-              <Card>
-                <CardActionArea>
-                  <CardContent>
-                    <input accept='image/*' id='contained-button-file' multiple type='file' />
-                    <label htmlFor='contained-button-file'>
-                      <Button variant='contained' color='primary' component='span'>
-                        Upload
-                      </Button>
-                    </label>
-                  </CardContent>
-                </CardActionArea>
-                <CardActions>
-                  <Button size='small' color='primary' onClick={handlePost}>
-                    Post
-                  </Button>
-                  <Button size='small' color='primary' onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                </CardActions>
-              </Card>
-            </Box>
-          )}
-        </form>
-      </Grid>
-      <Grid item xs={4}>
-        <Box textAlign='center'>
-          <Typography variant='h5' align='center'>
-            Guidlines
+    <Card className={classes.root}>
+      <CardHeader
+        avatar={
+          <Avatar aria-label='recipe' className={classes.avatar}>
+            R
+          </Avatar>
+        }
+        action={
+          <IconButton aria-label='settings'>
+            <MoreVertIcon />
+          </IconButton>
+        }
+        title={<Typography variant='h6'>User</Typography>}
+        subheader={<Typography variant='caption'>September 14th, 2020</Typography>}
+      />
+      {/* <CardMedia className={classes.media} image='/static/images/cards/paella.jpg' title='Paella dish' /> */}
+      <Divider />
+      <CardContent>
+        <Typography variant='h4'>Title</Typography>
+        <Typography variant='body1' style={{ marginTop: '1rem' }}>
+          This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the
+          mussels, if you like.
+        </Typography>
+      </CardContent>
+      <CardActions disableSpacing>
+        <IconButton aria-label='upvote'>
+          <ArrowUpwardIcon />
+        </IconButton>
+        <IconButton aria-label='downvote'>
+          <ArrowDownwardIcon />
+        </IconButton>
+        <IconButton aria-label='downvote'>
+          <CommentIcon />
+        </IconButton>
+        <IconButton
+          className={clsx(classes.expand, {
+            [classes.expandOpen]: expanded,
+          })}
+          onClick={handleExpandClick}
+          aria-expanded={expanded}
+          aria-label='show more'>
+          <ExpandMoreIcon />
+        </IconButton>
+      </CardActions>
+      <Collapse in={expanded} timeout='auto' unmountOnExit>
+        <CardContent>
+          <Typography variant='body2'>Method:</Typography>
+          <Typography paragraph>Heat 1/2 cup of the broth in a pot until simmering, add saffron and set aside for 10 minutes.</Typography>
+          <Typography paragraph>
+            Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over medium-high heat. Add chicken, shrimp and chorizo, and cook,
+            stirring occasionally until lightly browned, 6 to 8 minutes. Transfer shrimp to a large plate and set aside, leaving chicken and chorizo
+            in the pan. Add pimentón, bay leaves, garlic, tomatoes, onion, salt and pepper, and cook, stirring often until thickened and fragrant,
+            about 10 minutes. Add saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
           </Typography>
-          <li>hidsfdsfds dgsfsd</li>
-          <li>hi</li>
-          <li>hi</li>
-          <li>hi</li>
-          <li>hi</li>
-        </Box>
-      </Grid>
-    </Grid>
+          <Typography paragraph>
+            Add rice and stir very gently to distribute. Top with artichokes and peppers, and cook without stirring, until most of the liquid is
+            absorbed, 15 to 18 minutes. Reduce heat to medium-low, add reserved shrimp and mussels, tucking them down into the rice, and cook again
+            without stirring, until mussels have opened and rice is just tender, 5 to 7 minutes more. (Discard any mussels that don’t open.)
+          </Typography>
+          <Typography>Set aside off of the heat to let rest for 10 minutes, and then serve.</Typography>
+        </CardContent>
+      </Collapse>
+    </Card>
   );
 }

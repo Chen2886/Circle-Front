@@ -31,7 +31,7 @@ import Login from './Login.js';
 import Main from './Main.js';
 import Profile from './Profile.js';
 import CreateAccount from './createAccount.js';
-import Post from './Post.js';
+import CreatePost from './CreatePost.js';
 import Page404 from './404.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -276,7 +276,7 @@ export default function App(props) {
             component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />}
           />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
-          <Route exact path='/newPost' component={() => <Post />} />
+          <Route exact path='/newPost' component={() => <CreatePost />} />
           <Route
             exact
             path='/createAccount'

@@ -260,7 +260,7 @@ export default function Profile(props) {
         </Alert>
       </Snackbar>
       {userError && <Redirect to='/404'></Redirect>}
-      {!userError && (
+      {!userError && !loading && (
         <>
           <Grid container>
             <Grid item xs={12} md={requestedUser === currentUser ? 8 : 12}>
