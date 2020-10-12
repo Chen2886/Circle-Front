@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Main(props) {
   useEffect(() => {
+    
   }, [props]);
 
   return (
@@ -31,7 +32,7 @@ export default function Main(props) {
       <Fab color='primary' aria-label='My Circles' href='/myCircle'>
         <RadioButtonUncheckedIcon />
       </Fab>
-      <Timeline></Timeline>
+      <Timeline topic={props.topic}></Timeline>
     </>
   );
 }

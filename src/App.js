@@ -275,7 +275,7 @@ export default function App(props) {
             path='/login'
             component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />}
           />
-          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
+          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} topic={'all'} />} />
           <Route exact path='/newPost' component={() => <CreatePost />} />
           <Route
             exact
