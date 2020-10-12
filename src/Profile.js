@@ -116,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
   },
   chipLabel: {
-    fontSize: '20px'
+    fontSize: '20px',
   },
 }));
 
@@ -136,6 +136,7 @@ export default function Profile(props) {
   let { requestedUser } = useParams();
   const [bio, setBio] = React.useState('');
   const [lastUpdatedBio, setLastUpdatedBio] = React.useState('');
+  const [currentUserObj, setcurrentUserObj] = React.useState({});
   const [requestedUserObj, setRequestedUserObj] = React.useState({});
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
@@ -160,10 +161,11 @@ export default function Profile(props) {
       props.setShowLoginButton(true);
     }
     setAppBar();
-    getUser(requestedUser);
-  }, [props, requestedUser]);
+    getRequestedUser(requestedUser);
+    getcurrentUser(currentUser);
+  }, [props, requestedUser, currentUser]);
 
-  const editUserInfo = async (e) => {
+  const editUserInfo = async () => {
     if (editingUserInfo) {
       // not valid email
       if (!/[^@]*@[^.]*\..+/.test(email)) {
@@ -172,57 +174,95 @@ export default function Profile(props) {
         setAlertOpen(true);
         return;
       }
+      if (email === lastUpdatedEmail) {
+        setEditingUserInfo(!editingUserInfo);
+        return;
+      }
       setLoading(true);
-      var newEmail = e.target.value;
-      if (email === lastUpdatedEmail) return;
       var data = {
-        username: currentUser,
+        username: currentUserObj.username,
         email: email,
       };
-      console.log(data);
       try {
         await axios.put('https://cs307circle-production.herokuapp.com/api/updateUserEmail', data, headers);
         setAlertSeverity('success');
         setAlertMessage('Email updated!');
         setAlertOpen(true);
-        setLastUpdatedEmail(newEmail);
+        setLastUpdatedEmail(email);
+        setLoading(false);
       } catch (err) {
         setAlertSeverity('error');
         setAlertMessage(err.response.data);
         setAlertOpen(true);
         setEmail(lastUpdatedEmail);
+        setLoading(false);
       }
     }
-    setLoading(false);
     setEditingUserInfo(!editingUserInfo);
   };
 
-  const getUser = (requestedUser) => {
+  const getRequestedUser = async (requestedUser) => {
     setLoading(true);
-    axios
-      .get(
+    if (requestedUser === undefined || requestedUser === '') {
+      setAlertSeverity('error');
+      setAlertMessage('User error. Please try again later.');
+      setUserError(true);
+      setAlertOpen(true);
+      setLoading(false);
+      return;
+    }
+    try {
+      let res = await axios.get(
         'https://cs307circle-production.herokuapp.com/api/getUser',
         {
           params: { username: requestedUser },
         },
         headers
-      )
-      .then(function (res) {
-        setRequestedUserObj(res.data);
-        setBio(res.data.bio);
-        setEmail(res.data.email);
-        setLastUpdatedBio(res.data.bio);
-        setLastUpdatedEmail(res.data.email);
-        setCircles(res.data.listOfTopics);
-        setLoading(false);
-      })
-      .catch(function (err) {
-        setAlertSeverity('error');
-        setAlertMessage(err.response.data);
-        setUserError(true);
-        setAlertOpen(true);
-        setLoading(false);
-      });
+      );
+      setRequestedUserObj(res.data);
+      setBio(res.data.bio);
+      setEmail(res.data.email);
+      setLastUpdatedEmail(res.data.email);
+      setLastUpdatedBio(res.data.bio);
+      setCircles(res.data.listOfTopics);
+      setLoading(false);
+    } catch (err) {
+      setAlertSeverity('error');
+      setAlertMessage(err.response.data);
+      setUserError(true);
+      setAlertOpen(true);
+      setLoading(false);
+    }
+  };
+
+  const getcurrentUser = async (currentUser) => {
+    setLoading(true);
+    console.log(currentUser === '');
+    if (currentUser === undefined || currentUser === '') {
+      setAlertSeverity('error');
+      setAlertMessage('User error. Please try again later.');
+      setUserError(true);
+      setAlertOpen(true);
+      setLoading(false);
+      return;
+    }
+    try {
+      let res = await axios.get(
+        'https://cs307circle-production.herokuapp.com/api/getUser',
+        {
+          params: { username: currentUser },
+        },
+        headers
+      );
+      setcurrentUserObj(res.data);
+      setLoading(false);
+    } catch (err) {
+      setAlertSeverity('error');
+      setAlertMessage(err.response.data);
+      setUserError(true);
+      setAlertOpen(true);
+      setLoading(false);
+    }
   };
 
   const handleAlertClose = (event, reason) => {
@@ -234,7 +274,7 @@ export default function Profile(props) {
     var newBio = e.target.value;
     if (newBio === lastUpdatedBio) return;
     var data = {
-      username: currentUser,
+      username: currentUserObj.username,
       bio: newBio,
     };
     try {
@@ -252,7 +292,7 @@ export default function Profile(props) {
 
   return (
     <>
-      <Backdrop className={classes.backdrop} open={loading} onClick={() => setLoading(false)}>
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color='inherit' />
       </Backdrop>
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
@@ -264,7 +304,7 @@ export default function Profile(props) {
       {!userError && !loading && (
         <>
           <Grid container>
-            <Grid item xs={12} md={requestedUser === currentUser ? 8 : 12}>
+            <Grid item xs={12} md={requestedUser === currentUserObj.username ? 8 : 12}>
               <Card className={classes.avatarCard}>
                 <div className={classes.avatarContainer}>
                   <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} alt='avatar' />
@@ -274,7 +314,7 @@ export default function Profile(props) {
                     <Typography variant='h4' style={{ float: 'left' }}>
                       {requestedUserObj === null ? '' : requestedUserObj.username}
                     </Typography>
-                    {requestedUser !== currentUser && (
+                    {requestedUser !== currentUserObj.username && (
                       <Button
                         variant='outlined'
                         style={{ marginLeft: '1rem' }}
@@ -306,7 +346,7 @@ export default function Profile(props) {
                 </div>
               </Card>
             </Grid>
-            {requestedUser === currentUser && (
+            {requestedUser === currentUserObj.username && (
               <Grid item xs={12} md={4}>
                 <Card className={classes.settingsCard}>
                   <CardHeader
@@ -357,7 +397,7 @@ export default function Profile(props) {
                 {circles.map((circle) => (
                   <Chip
                     classes={{
-                      label: classes.chipLabel
+                      label: classes.chipLabel,
                     }}
                     key={circle}
                     variant='outlined'

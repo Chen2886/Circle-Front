@@ -6,11 +6,8 @@ import { Grid, Backdrop, CircularProgress, Snackbar } from '@material-ui/core';
 import axios from 'axios';
 import Alert from './Alert.js';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import EditIcon from '@material-ui/icons/Edit';
-import PeopleIcon from '@material-ui/icons/People';
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   container: {
     // margin: '1rem',
   },
@@ -21,14 +18,14 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-export default function Timeline(props) {
+export default function Timeline() {
   const classes = useStyles();
   const [posts, setPosts] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
   const [numOfPosts, setNumOfPosts] = React.useState(0);
-  const [hasMore, setHasMore] = React.useState(true);
+  const [hasMore] = React.useState(true);
 
   const handleAlertClose = (event, reason) => {
     if (reason === 'clickaway') return;
