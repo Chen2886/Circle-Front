@@ -48,8 +48,6 @@ export default function Post(props) {
     setExpanded(!expanded);
   };
 
-  console.log(props);
-
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -101,8 +99,8 @@ export default function Post(props) {
       <Collapse in={expanded} timeout='auto' unmountOnExit>
         <CardContent>
           {props.post.listOfComments.length === 0 && <Typography variant='body2'>No comments.</Typography>}
-          {props.post.listOfComments.length !== 0 && props.post.listOfComments.map((comment) => (
-            <Typography variant='body2'>{comment}</Typography>
+          {props.post.listOfComments.length !== 0 && props.post.listOfComments.map((comment, i) => (
+            <Typography variant='body2' key={i}>{comment}</Typography>
           ))}
         </CardContent>
       </Collapse>

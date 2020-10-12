@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Backdrop, CircularProgress, Snackbar } from '@material-ui/core';
 import axios from 'axios';
 import Alert from './Alert.js';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import EditIcon from '@material-ui/icons/Edit';
 import PeopleIcon from '@material-ui/icons/People';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
@@ -26,6 +27,8 @@ export default function Timeline(props) {
   const [loading, setLoading] = React.useState(false);
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
+  const [numOfPosts, setNumOfPosts] = React.useState(0);
+  const [hasMore, setHasMore] = React.useState(true);
 
   const handleAlertClose = (event, reason) => {
     if (reason === 'clickaway') return;
@@ -46,10 +49,11 @@ export default function Timeline(props) {
         headers
       )
       .then(function (res) {
-        var posts = res.data.sort(function (a, b) {
+        var sortedPosts = res.data.sort(function (a, b) {
           return b.dateAndTime.$date - a.dateAndTime.$date;
         });
-        setPosts(posts);
+        setPosts(sortedPosts);
+        setNumOfPosts(sortedPosts.length);
         setLoading(false);
       })
       .catch(function (err) {
@@ -57,7 +61,34 @@ export default function Timeline(props) {
         setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
         setLoading(false);
       });
-  }, [props]);
+  }, []);
+
+  const fetchMoreData = () => {
+    var data = {
+      author: 'user2',
+    };
+    axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/listPost',
+        {
+          params: data,
+        },
+        headers
+      )
+      .then(function (res) {
+        var sortedPosts = res.data.sort(function (a, b) {
+          return b.dateAndTime.$date - a.dateAndTime.$date;
+        });
+        setPosts(posts.concat(sortedPosts));
+        setNumOfPosts(numOfPosts + sortedPosts.length);
+        setLoading(false);
+      })
+      .catch(function (err) {
+        setAlertOpen(true);
+        setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
+        setLoading(false);
+      });
+  };
 
   return (
     <>
@@ -69,13 +100,27 @@ export default function Timeline(props) {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <Grid container alignItems='center' justify='center' className={classes.container}>
-        <Grid item xs={12} md={8}>
-          {posts.map((post) => (
-            <Post post={post} />
-          ))}
+      {!loading && (
+        <Grid container alignItems='center' justify='center' className={classes.container}>
+          <Grid item xs={12} md={8}>
+            <InfiniteScroll
+              dataLength={numOfPosts}
+              next={fetchMoreData}
+              hasMore={hasMore}
+              loader={
+                <Grid container alignItems='center' justify='center' style={{marginTop: '5rem', marginBottom: '5rem'}}>
+                  <Grid item>
+                    <CircularProgress />
+                  </Grid>
+                </Grid>
+              }>
+              {posts.map((post, i) => {
+                return <Post post={post} key={i} />;
+              })}
+            </InfiniteScroll>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </>
   );
 }
