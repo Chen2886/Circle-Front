@@ -32,7 +32,8 @@ import Main from './Main.js';
 import Profile from './Profile.js';
 import CreateAccount from './createAccount.js';
 import CreatePost from './CreatePost.js';
-import Page404 from './404.js'
+import Page404 from './404.js';
+import Topic from './Topic.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -129,7 +130,7 @@ const handleSearch = (event) => {
   if (event.key === 'Enter') console.log(event.target.value);
 };
 
-export default function App(props) {
+export default function App() {
   const classes = useStyles();
   const [showSearchField, setShowSearchField] = React.useState(true);
   const [showLoginButton, setShowLoginButton] = React.useState(true);
@@ -195,7 +196,7 @@ export default function App(props) {
                                 <ListItem button component='a' key='Home' href='/'>
                                   <ListItemText primary='Home' />
                                 </ListItem>
-                                <ListItem button component='a' key='New Post' href='/newPost'>
+                                <ListItem button key='New Post' component={Link} to='/CreatePost'>
                                   <ListItemText primary='New Post' />
                                 </ListItem>
                               </List>
@@ -273,10 +274,25 @@ export default function App(props) {
           <Route
             exact
             path='/login'
-            component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />}
+            component={() => (
+              <Login
+                setShowSearchField={setShowSearchField}
+                setShowLoginButton={setShowLoginButton}
+                setIsLoggedIn={setIsLoggedIn}
+                currentUser={currentUser}
+              />
+            )}
           />
-          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} topic={'all'} />} />
-          <Route exact path='/newPost' component={() => <CreatePost />} />
+          <Route
+            exact
+            path='/'
+            component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} topic={'all'} />}
+          />
+          <Route
+            exact
+            path='/createPost'
+            component={() => <CreatePost setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} currentUser={currentUser} />}
+          />
           <Route
             exact
             path='/createAccount'
@@ -287,7 +303,12 @@ export default function App(props) {
             path='/profile/:requestedUser'
             component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} currentUser={currentUser} />}
           />
-          <Route exact path='/404' component={() => <Page404></Page404>}/>
+          <Route
+            exact
+            path='/topic/:topic'
+            component={() => <Topic setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
+          />
+          <Route exact path='/404' component={() => <Page404></Page404>} />
         </Switch>
       </Router>
     </ThemeProvider>

@@ -2,15 +2,12 @@ import './App.css';
 import Post from './Post.js';
 import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Backdrop, CircularProgress, Snackbar } from '@material-ui/core';
+import { Grid, CircularProgress, Snackbar, Typography } from '@material-ui/core';
 import axios from 'axios';
 import Alert from './Alert.js';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import EditIcon from '@material-ui/icons/Edit';
-import PeopleIcon from '@material-ui/icons/People';
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   container: {
     // margin: '1rem',
   },
@@ -24,7 +21,6 @@ const headers = {
 export default function Timeline(props) {
   const classes = useStyles();
   const [posts, setPosts] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
   const [numOfPosts, setNumOfPosts] = React.useState(0);
@@ -36,10 +32,16 @@ export default function Timeline(props) {
   };
 
   useEffect(() => {
-    setLoading(true);
-    var data = {
-      author: 'user2',
-    };
+    var data = {};
+    if (props.user !== undefined) {
+      data = {
+        author: props.user,
+      };
+    } else {
+      data = {
+        topic: props.topic,
+      };
+    }
     axios
       .get(
         'https://cs307circle-staging.herokuapp.com/api/listPost',
@@ -54,19 +56,26 @@ export default function Timeline(props) {
         });
         setPosts(sortedPosts);
         setNumOfPosts(sortedPosts.length);
-        setLoading(false);
+        if (sortedPosts.length === 0) setHasMore(false);
       })
       .catch(function (err) {
         setAlertOpen(true);
         setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
-        setLoading(false);
+        setHasMore(false);
       });
-  }, []);
+  }, [props]);
 
   const fetchMoreData = () => {
-    var data = {
-      author: 'user2',
-    };
+    var data = {};
+    if (props.user !== undefined) {
+      data = {
+        author: props.user,
+      };
+    } else {
+      data = {
+        topic: props.topic,
+      };
+    }
     axios
       .get(
         'https://cs307circle-production.herokuapp.com/api/listPost',
@@ -81,34 +90,29 @@ export default function Timeline(props) {
         });
         setPosts(posts.concat(sortedPosts));
         setNumOfPosts(numOfPosts + sortedPosts.length);
-        setLoading(false);
       })
       .catch(function (err) {
         setAlertOpen(true);
         setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
-        setLoading(false);
       });
   };
 
   return (
     <>
-      <Backdrop className={classes.backdrop} open={loading} onClick={() => setLoading(false)}>
-        <CircularProgress color='inherit' />
-      </Backdrop>
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Alert onClose={handleAlertClose} severity='error'>
           {alertMessage}
         </Alert>
       </Snackbar>
-      {!loading && (
-        <Grid container alignItems='center' justify='center' className={classes.container}>
-          <Grid item xs={12} md={8}>
+      <Grid container alignItems='center' justify='center' className={classes.container}>
+        <Grid item xs={12} md={8}>
+          {posts.length !== 0 && (
             <InfiniteScroll
               dataLength={numOfPosts}
               next={fetchMoreData}
               hasMore={hasMore}
               loader={
-                <Grid container alignItems='center' justify='center' style={{marginTop: '5rem', marginBottom: '5rem'}}>
+                <Grid container alignItems='center' justify='center' style={{ marginTop: '5rem', marginBottom: '5rem' }}>
                   <Grid item>
                     <CircularProgress />
                   </Grid>
@@ -118,9 +122,16 @@ export default function Timeline(props) {
                 return <Post post={post} key={i} />;
               })}
             </InfiniteScroll>
-          </Grid>
+          )}
+          {posts.length === 0 && (
+            <Grid container alignItems='center' justify='center' style={{ marginTop: '5rem', marginBottom: '5rem' }}>
+              <Grid item>
+                <Typography variant='h6'>No posts available! Go make one.</Typography>
+              </Grid>
+            </Grid>
+          )}
         </Grid>
-      )}
+      </Grid>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import { Typography, Card, CardHeader, Avatar, IconButton, CardMedia, CardContent, CardActions, Divider } from '@material-ui/core';
+import { Typography, Card, CardHeader, Avatar, IconButton, CardContent, CardActions, Divider } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import { makeStyles } from '@material-ui/core/styles';
@@ -36,25 +36,52 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const stringToColor = (string) => {
+  let hash = 0;
+  let i;
+
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = '#';
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.substr(-2);
+  }
+  /* eslint-enable no-bitwise */
+
+  return color;
+};
+
 export default function Post(props) {
   // Add history and styles
   // Get requested user from URL param
   // Hooks
   // textfield changes
   const classes = useStyles();
+  const history = useHistory();
   const [expanded, setExpanded] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
+  const handleClickAvatar = () => {
+    history.push('/topic/' + props.post.topic);
+  };
+
   return (
     <Card className={classes.root}>
       <CardHeader
         avatar={
-          <Avatar aria-label='post' className={classes.avatar}>
-            {props.post.topic.charAt(0).toUpperCase()}
-          </Avatar>
+          <IconButton onClick={handleClickAvatar}>
+            <Avatar aria-label='post' style={{ backgroundColor: `${stringToColor(props.post.topic)}` }}>
+              {props.post.topic.charAt(0).toUpperCase()}
+            </Avatar>
+          </IconButton>
         }
         action={
           <IconButton aria-label='settings'>
@@ -99,9 +126,12 @@ export default function Post(props) {
       <Collapse in={expanded} timeout='auto' unmountOnExit>
         <CardContent>
           {props.post.listOfComments.length === 0 && <Typography variant='body2'>No comments.</Typography>}
-          {props.post.listOfComments.length !== 0 && props.post.listOfComments.map((comment, i) => (
-            <Typography variant='body2' key={i}>{comment}</Typography>
-          ))}
+          {props.post.listOfComments.length !== 0 &&
+            props.post.listOfComments.map((comment, i) => (
+              <Typography variant='body2' key={i}>
+                {comment}
+              </Typography>
+            ))}
         </CardContent>
       </Collapse>
     </Card>
