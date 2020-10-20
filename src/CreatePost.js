@@ -1,12 +1,80 @@
 import './App.css';
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import CommentIcon from '@material-ui/icons/Comment';
 import { useHistory } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
 import MmsIcon from '@material-ui/icons/Mms';
-import { Paper, Typography, TextField, Tabs, Tab, Box, Card, CardActionArea, CardContent, CardActions, Button, Grid } from '@material-ui/core';
+import { useDropzone } from 'react-dropzone';
+import { Typography, TextField, Tabs, Tab, Card, CardContent, CardActions, Button, Grid } from '@material-ui/core';
 
-export default function Post() {
+const useStyles = makeStyles(() => ({
+  grid: {
+    marginTop: '1rem',
+  },
+  card: {
+    margin: '2rem',
+    boxShadow: '0px 10px 13px -7px #000000, 0px 0px 8px 0px rgba(0,0,0,0)',
+  },
+  title: {
+    marginTop: '3rem',
+  },
+  textField: {
+    marginTop: '1rem',
+  },
+  uploadFileButton: {
+    marginTop: '1rem',
+    alignContent: 'right',
+  },
+  uploadFileArea: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '20px',
+    borderWidth: 2,
+    borderRadius: 2,
+    borderColor: '#528487',
+    borderStyle: 'dashed',
+    backgroundColor: '#fafafa',
+    color: '#bdbdbd',
+    outline: 'none',
+    transition: 'border .24s ease-in-out',
+    marginTop: '1rem',
+  },
+  img: {
+    marginTop: '1rem',
+    maxHeight: '20rem',
+  },
+}));
+
+export default function CreatePost(props) {
   const history = useHistory();
+  const classes = useStyles();
+  const [tab, setTab] = React.useState(0);
+  const [uploadedFiles, setUploadedFiles] = React.useState([]);
+
+  //
+  const onDrop = useCallback((acceptedFiles) => {
+    setUploadedFiles([]);
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onabort = () => console.log('file reading was aborted');
+      reader.onerror = () => console.log('file reading has failed');
+      reader.onloadend = () => setUploadedFiles((current) => [...current, reader.result]);
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ accept: 'image/*', onDrop });
+
+  useEffect(() => {
+    function setAppBar() {
+      props.setShowSearchField(false);
+      props.setShowLoginButton(true);
+    }
+    if (props.currentUser === null || props.currentUser === undefined || props.currentUser === '') history.push('/login');
+    setAppBar();
+  }, [props]);
 
   const handleCancel = () => {
     history.push('/');
@@ -16,96 +84,87 @@ export default function Post() {
     history.push('/');
   };
 
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleChange = (event, newTab) => {
+    setTab(newTab);
   };
 
-  return (
-    <Grid container>
-      {/* Empty grid to align items.*/}
-      <Grid item xs={4}></Grid>
-      <Grid item xs={4}>
-        <Box m={2}>
-          <Paper elevation={0}>
-            <Typography variant='h4' align='left'>
-              create a post
-            </Typography>
-          </Paper>
-        </Box>
-        <form noValidate autoComplete='off'>
-          <TextField id='outlined-basic' label='Select Circle' variant='outlined' />
-          <Tabs variant='fullWidth' value={value} onChange={handleChange}>
-            <Tab icon={<CommentIcon />} label='Text' />
-            <Tab icon={<MmsIcon />} label='Picture / Video' />
-          </Tabs>
-          {value === 0 && (
-            <Box p={3}>
-              <Card>
-                <CardActionArea>
-                  <CardContent>
-                    <TextField id='standard-basic' label='add title...' fullWidth />
-                    <TextField
-                      id='filled-multiline-static'
-                      label='write something nice...'
-                      multiline
-                      fullWidth
-                      rows={4}
-                      //defaultValue="Default Value"
-                      variant='filled'
-                    />
-                  </CardContent>
-                </CardActionArea>
-                <CardActions>
-                  <Button size='small' color='primary' onClick={handlePost}>
-                    Post
-                  </Button>
-                  <Button size='small' color='primary' onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                </CardActions>
-              </Card>
-            </Box>
-          )}
-          {value === 1 && (
-            <Box p={3}>
-              <Card>
-                <CardActionArea>
-                  <CardContent>
-                    <input accept='image/*' id='contained-button-file' multiple type='file' />
-                    <label htmlFor='contained-button-file'>
-                      <Button variant='contained' color='primary' component='span'>
-                        Upload
-                      </Button>
-                    </label>
-                  </CardContent>
-                </CardActionArea>
-                <CardActions>
-                  <Button size='small' color='primary' onClick={handlePost}>
-                    Post
-                  </Button>
-                  <Button size='small' color='primary' onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                </CardActions>
-              </Card>
-            </Box>
-          )}
-        </form>
-      </Grid>
-      <Grid item xs={4}>
-        <Box textAlign='center'>
-          <Typography variant='h5' align='center'>
-            Guidlines
-          </Typography>
-          <li>hidsfdsfds dgsfsd</li>
-          <li>hi</li>
-          <li>hi</li>
-          <li>hi</li>
-          <li>hi</li>
-        </Box>
-      </Grid>
+  const filePreview = (
+    <Grid container direction='column' justify='center' alignItems='center' style={{ width: '100%' }}>
+      {uploadedFiles.map((file, index) => {
+        return (
+          <Grid item xs={12} key={index}>
+            <img src={file} alt='uploaded file' className={classes.img} />
+          </Grid>
+        );
+      })}
     </Grid>
+  );
+
+  return (
+    <>
+      <Typography variant='h4' align='center' className={classes.title}>
+        Create a Post
+      </Typography>
+      <Grid container justify='center' className={classes.grid}>
+        <Grid item xs={12} md={3}>
+          <Card className={classes.card} style={{ padding: '1rem' }}>
+            <Typography variant='h5' align='center'>
+              Guidelines
+            </Typography>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Card className={classes.card}>
+            <Tabs variant='fullWidth' value={tab} onChange={handleChange}>
+              <Tab icon={<CommentIcon />} label='Text' />
+              <Tab icon={<MmsIcon />} label='Picture / Video' />
+            </Tabs>
+            {tab === 0 && (
+              <>
+                <CardContent>
+                  <TextField label='Circle' variant='outlined' fullWidth className={classes.textField} />
+                  <TextField label='Title' variant='outlined' fullWidth className={classes.textField} />
+                  <TextField label='Content' multiline fullWidth rows={10} variant='outlined' className={classes.textField} />
+                </CardContent>
+                <CardActions>
+                  <Button color='primary' onClick={handlePost}>
+                    Post
+                  </Button>
+                  <Button color='primary' onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                </CardActions>
+              </>
+            )}
+            {tab === 1 && (
+              <>
+                <CardContent>
+                  <TextField label='Circle' variant='outlined' fullWidth className={classes.textField} />
+                  <TextField label='Content' multiline fullWidth rows={10} variant='outlined' className={classes.textField} />
+                  <div {...getRootProps({ className: classes.uploadFileArea })}>
+                    <input {...getInputProps()} />
+                    <p>Drag 'n' drop some files here, or click to select files</p>
+                  </div>
+                  {filePreview}
+                </CardContent>
+                <CardActions>
+                  <Button color='primary' onClick={handlePost}>
+                    Post
+                  </Button>
+                  <Button color='primary' onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                </CardActions>
+              </>
+            )}
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={3}></Grid>
+      </Grid>
+    </>
   );
 }

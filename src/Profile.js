@@ -148,10 +148,12 @@ export default function Profile(props) {
   const [editingUserInfo, setEditingUserInfo] = React.useState(false);
   const [circles, setCircles] = React.useState([]);
 
+  console.log(props);
+
   // if url does not include requested user
   if (requestedUser === null || requestedUser === '') {
     console.log(requestedUser);
-    // history.push('/404');
+    history.push('/404');
   }
 
   const bioChanged = (e) => setBio(e.target.value);
