@@ -151,7 +151,7 @@ export default function Login(props) {
   useEffect(() => {
     function setAppBar() {
       props.setShowSearchField(false);
-      props.setShowLoginButton(true);
+      props.setShowLoginButton(false);
     }
     setAppBar();
     setUsername(localStorage.getItem('username'));
