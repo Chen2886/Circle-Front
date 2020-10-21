@@ -5,9 +5,24 @@ import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import MmsIcon from '@material-ui/icons/Mms';
 import { useDropzone } from 'react-dropzone';
-import { Typography, TextField, Tabs, Tab, Card, CardContent, CardActions, Button, Grid } from '@material-ui/core';
+import {
+  Typography,
+  TextField,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Grid,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
+  Backdrop,
+} from '@material-ui/core';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   grid: {
     marginTop: '1rem',
   },
@@ -43,7 +58,17 @@ const useStyles = makeStyles(() => ({
   },
   img: {
     marginTop: '1rem',
-    maxHeight: '20rem',
+    maxHeight: '30rem',
+    objectFit: 'contain',
+    maxWidth: '100%',
+  },
+  previewImg: {
+    maxHeight: '100%',
+    maxWidth: '100%',
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
   },
 }));
 
@@ -52,6 +77,8 @@ export default function CreatePost(props) {
   const classes = useStyles();
   const [tab, setTab] = React.useState(0);
   const [uploadedFiles, setUploadedFiles] = React.useState([]);
+  const [openPreview, setOpenPreview] = React.useState(false);
+  const [imgSrc, setImgSrc] = React.useState();
 
   //
   const onDrop = useCallback((acceptedFiles) => {
@@ -89,19 +116,34 @@ export default function CreatePost(props) {
   };
 
   const filePreview = (
-    <Grid container direction='column' justify='center' alignItems='center' style={{ width: '100%' }}>
+    <Grid container direction='row' justify='center' alignItems='center' spacing={2}>
       {uploadedFiles.map((file, index) => {
+        console.log(index);
+        console.log(uploadedFiles.length - index - 1 < 3 && uploadedFiles.length % 3 !== 0 ? 12 / (uploadedFiles.length % 3) : 4);
         return (
-          <Grid item xs={12} key={index}>
-            <img src={file} alt='uploaded file' className={classes.img} />
+          <Grid item xs={uploadedFiles.length - index - 1 < uploadedFiles.length % 3 ? 12 / (uploadedFiles.length % 3) : 4} key={index}>
+            <img
+              src={file}
+              alt='uploaded file'
+              className={classes.img}
+              onClick={() => {
+                setImgSrc(file);
+                handleClickOpenPreview();
+              }}
+            />
           </Grid>
         );
       })}
     </Grid>
   );
 
+  const handleClickOpenPreview = () => setOpenPreview(true);
+  const handleClosePreview = () => setOpenPreview(false);
   return (
     <>
+      <Backdrop open={openPreview} onClick={handleClosePreview} className={classes.backdrop}>
+        <img src={imgSrc} className={classes.previewImg} />
+      </Backdrop>
       <Typography variant='h4' align='center' className={classes.title}>
         Create a Post
       </Typography>
