@@ -147,8 +147,8 @@ export default function Profile(props) {
   const [lastUpdatedEmail, setLastUpdatedEmail] = React.useState('');
   const [editingUserInfo, setEditingUserInfo] = React.useState(false);
   const [circles, setCircles] = React.useState([]);
-
-  console.log(props);
+  const [listOfFollowers, setListOfFollowers] = React.useState([]);
+  const [listOfFollowing, setListOfFollowing] = React.useState([]);
 
   // if url does not include requested user
   if (requestedUser === null || requestedUser === '') {
@@ -231,6 +231,8 @@ export default function Profile(props) {
       setLastUpdatedEmail(res.data.email);
       setLastUpdatedBio(res.data.bio);
       setCircles(res.data.listOfTopics);
+      setListOfFollowers(res.data.listOfFollowers);
+      setListOfFollowers(res.data.listOfFollowing);
       setLoading(false);
     } catch (err) {
       setAlertSeverity('error');
@@ -343,9 +345,7 @@ export default function Profile(props) {
                     {requestedUser === currentUser && (
                       <TextField label='Bio' key='Bio' fullWidth multiline rows={4} value={bio} onChange={bioChanged} onBlur={(e) => bioBlur(e)} />
                     )}
-                    {requestedUser !== currentUser && (
-                      <Typography variant='body1'>{requestedUserObj.bio}</Typography>
-                    )}
+                    {requestedUser !== currentUser && <Typography variant='body1'>{requestedUserObj.bio}</Typography>}
                   </div>
                 </div>
               </Card>
@@ -398,22 +398,80 @@ export default function Profile(props) {
             </Typography>
             <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
               <div className={classes.followedCircles}>
-                {circles.map((circle) => (
-                  <Chip
-                    classes={{
-                      label: classes.chipLabel,
-                    }}
-                    key={circle}
-                    variant='outlined'
-                    avatar={<Avatar>{circle.charAt(0)}</Avatar>}
-                    size='medium'
-                    color='primary'
-                    label={circle}
-                  />
-                ))}
+                {circles.length === 0 && <Typography variant='h5'>No CIRCLEs.</Typography>}
+                {circles.length !== 0 &&
+                  circles.map((circle) => (
+                    <Chip
+                      classes={{
+                        label: classes.chipLabel,
+                      }}
+                      key={circle}
+                      variant='outlined'
+                      avatar={<Avatar>{circle.charAt(0)}</Avatar>}
+                      size='medium'
+                      color='primary'
+                      label={circle}
+                    />
+                  ))}
               </div>
             </div>
           </Card>
+          <Grid container>
+            <Grid item xs={12} md={6}>
+              <Card className={classes.infoCard}>
+                <Divider variant='middle' />
+                <Typography variant='h6' className={classes.infoTitle}>
+                  Following
+                </Typography>
+                <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                  <div className={classes.followedCircles}>
+                    {listOfFollowing.length === 0 && <Typography variant='h5'>No followings</Typography>}
+                    {listOfFollowing.length !== 0 &&
+                      listOfFollowing.map((following) => (
+                        <Chip
+                          classes={{
+                            label: classes.chipLabel,
+                          }}
+                          key={following}
+                          variant='outlined'
+                          avatar={<Avatar>{following.charAt(0)}</Avatar>}
+                          size='medium'
+                          color='primary'
+                          label={following}
+                        />
+                      ))}
+                  </div>
+                </div>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Card className={classes.infoCard}>
+                <Divider variant='middle' />
+                <Typography variant='h6' className={classes.infoTitle}>
+                  Follower
+                </Typography>
+                <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                  <div className={classes.followedCircles}>
+                    {listOfFollowers.length === 0 && <Typography variant='h5'>No Followers</Typography>}
+                    {listOfFollowers.length !== 0 &&
+                      listOfFollowers.map((follower) => (
+                        <Chip
+                          classes={{
+                            label: classes.chipLabel,
+                          }}
+                          key={follower}
+                          variant='outlined'
+                          avatar={<Avatar>{follower.charAt(0)}</Avatar>}
+                          size='medium'
+                          color='primary'
+                          label={follower}
+                        />
+                      ))}
+                  </div>
+                </div>
+              </Card>
+            </Grid>
+          </Grid>
           <Timeline user={requestedUser}></Timeline>
         </>
       )}
