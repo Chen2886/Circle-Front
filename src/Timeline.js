@@ -44,7 +44,7 @@ export default function Timeline(props) {
     }
     axios
       .get(
-        'https://cs307circle-staging.herokuapp.com/api/listPost',
+        'https://cs307circle-production.herokuapp.com/api/listPost',
         {
           params: data,
         },
@@ -94,6 +94,7 @@ export default function Timeline(props) {
       .catch(function (err) {
         setAlertOpen(true);
         setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
+        setHasMore(false);
       });
   };
 

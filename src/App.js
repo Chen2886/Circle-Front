@@ -347,7 +347,7 @@ export default function App() {
           <Route
             exact
             path='/createPost'
-            component={() => <CreatePost setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} currentUser={currentUser} />}
+            component={() => <CreatePost setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
           <Route
             exact
@@ -357,7 +357,7 @@ export default function App() {
           <Route
             exact
             path='/profile/:requestedUser'
-            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} currentUser={currentUser} />}
+            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
           <Route
             exact

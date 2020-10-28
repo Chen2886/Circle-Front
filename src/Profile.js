@@ -132,7 +132,7 @@ export default function Profile(props) {
   // Hooks
   const history = useHistory();
   const classes = useStyles();
-  const currentUser = props.currentUser;
+  const currentUser = localStorage.getItem('user');
   let { requestedUser } = useParams();
   const [bio, setBio] = React.useState('');
   const [lastUpdatedBio, setLastUpdatedBio] = React.useState('');
