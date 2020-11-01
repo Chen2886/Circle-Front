@@ -156,7 +156,8 @@ export default function Login(props) {
       props.setShowLoginButton(false);
     }
     setAppBar();
-    setUsername(localStorage.getItem('username'));
+    if (localStorage.getItem('rememberMe') === 'true')
+      setUsername(localStorage.getItem('username'));
   }, [setUsername, props]);
 
   const handleAlertClose = (event, reason) => {

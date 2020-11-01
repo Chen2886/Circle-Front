@@ -37,10 +37,27 @@ export default function Timeline(props) {
       data = {
         author: props.user,
       };
-    } else {
+    } else if (props.topic !== undefined) {
       data = {
         topic: props.topic,
       };
+    } else if (props.user === undefined && props.topic === undefined) {
+      axios
+        .get('https://cs307circle-production.herokuapp.com/api/getAllPosts', headers)
+        .then(function (res) {
+          var sortedPosts = res.data.sort(function (a, b) {
+            return b.dateAndTime.$date - a.dateAndTime.$date;
+          });
+          setPosts(sortedPosts);
+          setNumOfPosts(sortedPosts.length);
+          if (sortedPosts.length === 0) setHasMore(false);
+        })
+        .catch(function (err) {
+          setAlertOpen(true);
+          setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
+          setHasMore(false);
+        });
+        return;
     }
     axios
       .get(
@@ -60,42 +77,13 @@ export default function Timeline(props) {
       })
       .catch(function (err) {
         setAlertOpen(true);
-        setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
+        setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
         setHasMore(false);
       });
   }, [props]);
 
   const fetchMoreData = () => {
-    var data = {};
-    if (props.user !== undefined) {
-      data = {
-        author: props.user,
-      };
-    } else {
-      data = {
-        topic: props.topic,
-      };
-    }
-    axios
-      .get(
-        'https://cs307circle-production.herokuapp.com/api/listPost',
-        {
-          params: data,
-        },
-        headers
-      )
-      .then(function (res) {
-        var sortedPosts = res.data.sort(function (a, b) {
-          return b.dateAndTime.$date - a.dateAndTime.$date;
-        });
-        setPosts(posts.concat(sortedPosts));
-        setNumOfPosts(numOfPosts + sortedPosts.length);
-      })
-      .catch(function (err) {
-        setAlertOpen(true);
-        setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
-        setHasMore(false);
-      });
+    setHasMore(false);
   };
 
   return (

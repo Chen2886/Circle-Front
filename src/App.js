@@ -339,11 +339,7 @@ export default function App() {
               />
             )}
           />
-          <Route
-            exact
-            path='/'
-            component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} topic={'all'} />}
-          />
+          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route
             exact
             path='/createPost'

@@ -37,7 +37,7 @@ export default function Main(props) {
       <Fab color='primary' aria-label='My Circles' component={Link} to='/myCircle'>
         <RadioButtonUncheckedIcon />
       </Fab>
-      <Timeline topic={props.topic}></Timeline>
+      <Timeline user={localStorage.getItem('user')}></Timeline>
     </>
   );
 }

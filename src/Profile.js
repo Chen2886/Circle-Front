@@ -273,6 +273,13 @@ export default function Profile(props) {
 
   const bioBlur = async (e) => {
     var newBio = e.target.value;
+    if (newBio.length > 150) {
+      setAlertSeverity('error');
+      setAlertMessage('Bio needs to be shorter than 150 charaters.');
+      setAlertOpen(true);
+      setBio(lastUpdatedBio);
+      return;
+    }
     if (newBio === lastUpdatedBio) return;
     var data = {
       username: currentUserObj.username,
@@ -323,7 +330,7 @@ export default function Profile(props) {
                           root: classes.button,
                           label: classes.buttonLabel,
                         }}>
-                        CONNECT
+                        FOLLOW
                       </Button>
                     )}
                   </div>
