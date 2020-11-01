@@ -33,15 +33,15 @@ export default function Timeline(props) {
 
   useEffect(() => {
     var data = {};
-    if (props.user !== undefined) {
+    if (props.user !== undefined && props.user !== null) {
       data = {
         author: props.user,
       };
-    } else if (props.topic !== undefined) {
+    } else if (props.topic !== undefined && props.topic !== null) {
       data = {
         topic: props.topic,
       };
-    } else if (props.user === undefined && props.topic === undefined) {
+    } else if ((props.user === undefined || props.user === null) && (props.topic === undefined || props.topic === null)) {
       axios
         .get('https://cs307circle-production.herokuapp.com/api/getAllPosts', headers)
         .then(function (res) {
@@ -57,7 +57,7 @@ export default function Timeline(props) {
           setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
           setHasMore(false);
         });
-        return;
+      return;
     }
     axios
       .get(

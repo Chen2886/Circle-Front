@@ -72,6 +72,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Content-Type': 'application/json',
+};
+
 export default function CreatePost(props) {
   const history = useHistory();
   const classes = useStyles();

@@ -27,10 +27,10 @@ export default function Page404() {
   const classes = useStyles();
   return (
     <div>
-      <section class='error-container'>
+      <section className='error-container'>
         <span>4</span>
         <span>
-          <span class='screen-reader-text'>0</span>
+          <span className='screen-reader-text'>0</span>
         </span>
         <span>4</span>
       </section>
