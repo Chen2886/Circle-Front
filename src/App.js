@@ -2,7 +2,7 @@ import './App.css';
 import logo from './resources/logo.png';
 import React, { useEffect } from 'react';
 
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 import Helmet from 'react-helmet';
 
 import { ThemeProvider } from '@material-ui/styles';
@@ -20,6 +20,12 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  DialogTitle,
+  DialogContentText,
+  TextField,
 } from '@material-ui/core';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -34,6 +40,7 @@ import CreateAccount from './createAccount.js';
 import CreatePost from './CreatePost.js';
 import Page404 from './404.js';
 import Topic from './Topic.js';
+import { sha256 } from 'js-sha256';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -138,6 +145,9 @@ export default function App() {
   const [currentUser, setCurrentUser] = React.useState('');
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [redirectToLogin, setRedirectToLogin] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [deleteAccountPassword, setDeleteAccountPassword] = React.useState('');
 
   window.onbeforeunload = () => {
     if (localStorage.getItem('rememberMe') !== 'true') localStorage.removeItem('user');
@@ -153,6 +163,13 @@ export default function App() {
     localStorage.removeItem('user');
     setCurrentUser(localStorage.getItem('user'));
     setAnchorEl(null);
+  };
+  const handleDeleteAccount = () => {
+    if (currentUser === null) {
+      setRedirectToLogin(true);
+    } else {
+      setDeleteDialogOpen(true);
+    }
   };
 
   useEffect(() => {
@@ -171,8 +188,46 @@ export default function App() {
     setDrawerOpen(open);
   };
 
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+  };
+  const handleConfirmDeleteDialog = () => {
+    // TODO: API delete account
+    console.log(currentUser);
+    console.log(deleteAccountPassword);
+    setDeleteDialogOpen(false);
+  };
+
+  const handleDeletePasswordChange = (e) => setDeleteAccountPassword(e.target.value);
+
   return (
     <ThemeProvider theme={theme}>
+      {redirectToLogin && <Redirect to='/login'></Redirect>}
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog} aria-labelledby='form-dialog-title'>
+        <DialogTitle id='form-dialog-title'>Delete your Account</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete your account? This actions is irriversible. If so, please enter your password.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin='dense'
+            label='Password'
+            type='password'
+            fullWidth
+            value={deleteAccountPassword}
+            onChange={handleDeletePasswordChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDeleteDialog} color='primary'>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Router>
         <div className={classes.grow}>
           <Helmet>
@@ -264,6 +319,7 @@ export default function App() {
               <MenuItem onClick={handleRedirectToProfilePage} component={Link} to={'/profile/' + currentUser}>
                 Profile
               </MenuItem>
+              <MenuItem onClick={handleDeleteAccount}>Delete Account</MenuItem>
               <MenuItem onClick={handleLogout} component={Link} to='/'>
                 Logout
               </MenuItem>
@@ -283,15 +339,11 @@ export default function App() {
               />
             )}
           />
-          <Route
-            exact
-            path='/'
-            component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} topic={'all'} />}
-          />
+          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route
             exact
             path='/createPost'
-            component={() => <CreatePost setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} currentUser={currentUser} />}
+            component={() => <CreatePost setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
           <Route
             exact
@@ -301,7 +353,7 @@ export default function App() {
           <Route
             exact
             path='/profile/:requestedUser'
-            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} currentUser={currentUser} />}
+            component={() => <Profile setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
           <Route
             exact

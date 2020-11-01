@@ -148,13 +148,16 @@ export default function Login(props) {
   const usernameChanged = (e) => setUsername(e.target.value);
   const changeRememberMe = (e) => setRememberMe(e.target.checked);
 
+  if (props.currentUser !== null && props.currentUser !== '') history.push('/');
+
   useEffect(() => {
     function setAppBar() {
       props.setShowSearchField(false);
-      props.setShowLoginButton(true);
+      props.setShowLoginButton(false);
     }
     setAppBar();
-    setUsername(localStorage.getItem('username'));
+    if (localStorage.getItem('rememberMe') === 'true')
+      setUsername(localStorage.getItem('username'));
   }, [setUsername, props]);
 
   const handleAlertClose = (event, reason) => {
