@@ -149,9 +149,14 @@ export default function Profile(props) {
   const [circles, setCircles] = React.useState([]);
   const [listOfFollowers, setListOfFollowers] = React.useState([]);
   const [listOfFollowing, setListOfFollowing] = React.useState([]);
+  const [currentCircles, setCurrentCircles] = React.useState([]);
+  const [currentListOfFollowers, setCurrentListOfFollowers] = React.useState([]);
+  const [currentListOfFollowing, setCurrentListOfFollowing] = React.useState([]);
+  const [currentUserFollowRequestedUser, setCurrentUserFollowRequestedUser] = React.useState(false);
+  const [followButtonMessage, setFollowButtonMessage] = React.useState('');
 
   // if url does not include requested user
-  if (requestedUser === null || requestedUser === '') {
+  if (requestedUser === null || requestedUser === '' || requestedUser === undefined) {
     console.log(requestedUser);
     history.push('/404');
   }
@@ -169,6 +174,10 @@ export default function Profile(props) {
     getRequestedUser(requestedUser);
     getcurrentUser(currentUser);
   }, [props, requestedUser, currentUser]);
+
+  useEffect(() => {
+    checkFollowing();
+  }, [currentListOfFollowing]);
 
   const editUserInfo = async () => {
     if (editingUserInfo) {
@@ -217,30 +226,36 @@ export default function Profile(props) {
       setRequestedUserObj({});
       return;
     }
+
     try {
-      let res = await axios.get(
-        'https://cs307circle-production.herokuapp.com/api/getUser',
-        {
-          params: { username: requestedUser },
-        },
-        headers
-      );
-      setRequestedUserObj(res.data);
-      setBio(res.data.bio);
-      setEmail(res.data.email);
-      setLastUpdatedEmail(res.data.email);
-      setLastUpdatedBio(res.data.bio);
-      setCircles(res.data.listOfTopics);
-      setListOfFollowers(res.data.listOfFollowers);
-      setListOfFollowers(res.data.listOfFollowing);
+      await axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/getUser',
+          {
+            params: { username: requestedUser },
+          },
+          headers
+        )
+        .then((res) => {
+          setRequestedUserObj(res.data);
+          setBio(res.data.bio);
+          setEmail(res.data.email);
+          setLastUpdatedEmail(res.data.email);
+          setLastUpdatedBio(res.data.bio);
+        })
+        .catch((err) => {
+          setAlertSeverity('error');
+          setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
+          setUserError(true);
+          setAlertOpen(true);
+          setLoading(false);
+        });
+
+      await updateTopics(requestedUser, setCircles);
+      await updateListOfFollowing(requestedUser, setListOfFollowing);
+      await updateListOfFollowers(requestedUser, setListOfFollowers);
       setLoading(false);
-    } catch (err) {
-      setAlertSeverity('error');
-      setAlertMessage(err.response.data);
-      setUserError(true);
-      setAlertOpen(true);
-      setLoading(false);
-    }
+    } catch (err) {}
   };
 
   const getcurrentUser = async (currentUser) => {
@@ -250,20 +265,73 @@ export default function Profile(props) {
       setCurrentUserObj({});
       return;
     }
+
     try {
-      let res = await axios.get(
-        'https://cs307circle-production.herokuapp.com/api/getUser',
-        {
-          params: { username: currentUser },
-        },
-        headers
-      );
-      setCurrentUserObj(res.data);
-      setLoading(false);
-    } catch (err) {
-      setCurrentUserObj({});
-      setLoading(false);
-    }
+      await axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/getUser',
+          {
+            params: { username: currentUser },
+          },
+          headers
+        )
+        .then((res) => {
+          setCurrentUserObj(res.data);
+        })
+        .catch((err) => {
+          setCurrentUserObj({});
+          setLoading(false);
+        });
+
+      await updateTopics(currentUser, setCurrentCircles);
+      await updateListOfFollowing(currentUser, setCurrentListOfFollowing);
+      await updateListOfFollowers(currentUser, setCurrentListOfFollowers);
+    } catch (err) {}
+  };
+
+  const updateTopics = async (username, f) => {
+    try {
+      await axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/getUserTopics',
+          {
+            params: { username: username },
+          },
+          headers
+        )
+        .then((res) => f(res.data))
+        .catch((err) => f([]));
+    } catch (err) {}
+  };
+
+  const updateListOfFollowers = async (username, f) => {
+    try {
+      await axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/listFollowers',
+          {
+            params: { username: username },
+          },
+          headers
+        )
+        .then((res) => f(res.data))
+        .catch((err) => f([]));
+    } catch (err) {}
+  };
+
+  const updateListOfFollowing = async (username, f) => {
+    try {
+      await axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/listFollowing',
+          {
+            params: { username: username },
+          },
+          headers
+        )
+        .then((res) => f(res.data))
+        .catch((err) => f([]));
+    } catch (err) {}
   };
 
   const handleAlertClose = (event, reason) => {
@@ -298,6 +366,35 @@ export default function Profile(props) {
     }
   };
 
+  const followUser = async () => {
+    var data = {
+      user1: currentUserObj.username,
+      user2: requestedUser,
+    };
+    await axios.put('https://cs307circle-production.herokuapp.com/api/followUser', data, headers);
+    await updateListOfFollowing(currentUser, setCurrentListOfFollowing);
+    await updateListOfFollowers(requestedUser, setListOfFollowers);
+  };
+
+  const unfollowUser = async () => {
+    var data = {
+      user1: currentUserObj.username,
+      user2: requestedUser,
+    };
+    await axios.put('https://cs307circle-production.herokuapp.com/api/unfollowUser', data, headers);
+    await updateListOfFollowing(currentUser, setCurrentListOfFollowing);
+    await updateListOfFollowers(requestedUser, setListOfFollowers);
+  };
+
+  const checkFollowing = () => {
+    var temp = false;
+    currentListOfFollowing.forEach((following) => {
+      if (following.username === requestedUser) temp = true;
+    });
+    setCurrentUserFollowRequestedUser(temp);
+    setFollowButtonMessage(temp ? 'UNFOLLOW' : 'FOLLOW');
+  };
+
   return (
     <>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -326,11 +423,12 @@ export default function Profile(props) {
                       <Button
                         variant='outlined'
                         style={{ marginLeft: '1rem' }}
+                        onClick={currentUserFollowRequestedUser ? unfollowUser : followUser}
                         classes={{
                           root: classes.button,
                           label: classes.buttonLabel,
                         }}>
-                        FOLLOW
+                        {followButtonMessage}
                       </Button>
                     )}
                   </div>
@@ -407,17 +505,18 @@ export default function Profile(props) {
               <div className={classes.followedCircles}>
                 {circles.length === 0 && <Typography variant='h5'>No CIRCLEs.</Typography>}
                 {circles.length !== 0 &&
-                  circles.map((circle) => (
+                  circles.map((circle, i) => (
                     <Chip
                       classes={{
                         label: classes.chipLabel,
                       }}
                       key={circle}
                       variant='outlined'
-                      avatar={<Avatar>{circle.charAt(0)}</Avatar>}
+                      avatar={<Avatar>{circle.topic.charAt(0).toUpperCase()}</Avatar>}
                       size='medium'
                       color='primary'
-                      label={circle}
+                      label={circle.topic}
+                      key={i}
                     />
                   ))}
               </div>
@@ -434,17 +533,18 @@ export default function Profile(props) {
                   <div className={classes.followedCircles}>
                     {listOfFollowing.length === 0 && <Typography variant='h5'>No followings</Typography>}
                     {listOfFollowing.length !== 0 &&
-                      listOfFollowing.map((following) => (
+                      listOfFollowing.map((following, i) => (
                         <Chip
                           classes={{
                             label: classes.chipLabel,
                           }}
                           key={following}
                           variant='outlined'
-                          avatar={<Avatar>{following.charAt(0)}</Avatar>}
+                          avatar={<Avatar>{following.username.charAt(0).toUpperCase()}</Avatar>}
                           size='medium'
                           color='primary'
-                          label={following}
+                          label={following.username}
+                          key={i}
                         />
                       ))}
                   </div>
@@ -461,17 +561,18 @@ export default function Profile(props) {
                   <div className={classes.followedCircles}>
                     {listOfFollowers.length === 0 && <Typography variant='h5'>No Followers</Typography>}
                     {listOfFollowers.length !== 0 &&
-                      listOfFollowers.map((follower) => (
+                      listOfFollowers.map((follower, i) => (
                         <Chip
                           classes={{
                             label: classes.chipLabel,
                           }}
                           key={follower}
                           variant='outlined'
-                          avatar={<Avatar>{follower.charAt(0)}</Avatar>}
+                          avatar={<Avatar>{follower.username.charAt(0).toUpperCase()}</Avatar>}
                           size='medium'
                           color='primary'
-                          label={follower}
+                          label={follower.username}
+                          key={i}
                         />
                       ))}
                   </div>
