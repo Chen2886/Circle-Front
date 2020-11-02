@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 import Helmet from 'react-helmet';
+import axios from 'axios';
 
 import { ThemeProvider } from '@material-ui/styles';
 import {
@@ -26,6 +27,7 @@ import {
   DialogTitle,
   DialogContentText,
   TextField,
+  Snackbar,
 } from '@material-ui/core';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -40,6 +42,7 @@ import CreateAccount from './createAccount.js';
 import CreatePost from './CreatePost.js';
 import Page404 from './404.js';
 import Topic from './Topic.js';
+import Alert from './Alert.js';
 import { sha256 } from 'js-sha256';
 
 const useStyles = makeStyles((theme) => ({
@@ -133,8 +136,9 @@ const theme = createMuiTheme({
   },
 });
 
-const handleSearch = (event) => {
-  if (event.key === 'Enter') console.log(event.target.value);
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Content-Type': 'application/json',
 };
 
 export default function App() {
@@ -148,6 +152,11 @@ export default function App() {
   const [redirectToLogin, setRedirectToLogin] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [deleteAccountPassword, setDeleteAccountPassword] = React.useState('');
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState('');
+  const [searchRedirect, setSearchRedirect] = React.useState(false);
+  const [searchRedirectUrl, setSearchRedirectUrl] = React.useState('');
+  const [searchValue, setSearchValue] = React.useState('');
 
   window.onbeforeunload = () => {
     if (localStorage.getItem('rememberMe') !== 'true') localStorage.removeItem('user');
@@ -176,6 +185,8 @@ export default function App() {
     // this forces rerender
     setIsLoggedIn(false);
     setCurrentUser(localStorage.getItem('user'));
+    setSearchRedirect(false);
+    setSearchRedirectUrl('');
   }, [isLoggedIn]);
 
   const toggleDrawer = (open) => (event) => {
@@ -198,11 +209,55 @@ export default function App() {
     setDeleteDialogOpen(false);
   };
 
+  const handleAlertClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setAlertOpen(false);
+  };
+
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter') {
+      var userFailuer = false;
+      var topicFailuer = false;
+      try {
+        await axios.get('https://cs307circle-production.herokuapp.com/api/getUser', { params: { username: searchValue } }, headers);
+      } catch (err) {
+        userFailuer = true;
+      }
+      try {
+        await axios.get('https://cs307circle-production.herokuapp.com/api/listPost', { params: { topic: searchValue } }, headers);
+      } catch (err) {
+        topicFailuer = true;
+      }
+      if (!userFailuer) {
+        setSearchRedirectUrl('/profile/' + searchValue);
+        setSearchValue('');
+        setSearchRedirect(true);
+        return;
+      } else if (!topicFailuer) {
+        setSearchRedirectUrl('/topic/' + searchValue);
+        setSearchValue('');
+        setSearchRedirect(true);
+        return;
+      } else {
+        setAlertMessage('Neither a user or a topic has this name.');
+        setAlertOpen(true);
+      }
+    }
+  };
+
+  const searchChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
   const handleDeletePasswordChange = (e) => setDeleteAccountPassword(e.target.value);
 
   return (
     <ThemeProvider theme={theme}>
-      {redirectToLogin && <Redirect to='/login'></Redirect>}
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={handleAlertClose} severity='error'>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
       <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog} aria-labelledby='form-dialog-title'>
         <DialogTitle id='form-dialog-title'>Delete your Account</DialogTitle>
         <DialogContent>
@@ -229,6 +284,8 @@ export default function App() {
         </DialogActions>
       </Dialog>
       <Router>
+        {redirectToLogin && <Redirect to='/login'></Redirect>}
+        {searchRedirect && <Redirect to={searchRedirectUrl}></Redirect>}
         <div className={classes.grow}>
           <Helmet>
             <title>Home</title>
@@ -286,6 +343,8 @@ export default function App() {
                           }}
                           inputProps={{ 'aria-label': 'search' }}
                           onKeyPress={handleSearch}
+                          onChange={searchChange}
+                          value={searchValue}
                         />
                       </div>
                     )}
@@ -330,14 +389,7 @@ export default function App() {
           <Route
             exact
             path='/login'
-            component={() => (
-              <Login
-                setShowSearchField={setShowSearchField}
-                setShowLoginButton={setShowLoginButton}
-                setIsLoggedIn={setIsLoggedIn}
-                currentUser={currentUser}
-              />
-            )}
+            component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />}
           />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route
