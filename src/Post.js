@@ -97,7 +97,10 @@ export default function Post(props) {
   useEffect(() => {
     if (props.post.votes !== undefined) setVotes(props.post.votes);
     updateComments();
-    console.log(comments);
+    if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '') {
+      setDisableDownvote(true);
+      setDisableUpvote(true);
+    }
   }, [props]);
 
   const handleExpandClick = () => {
@@ -108,9 +111,9 @@ export default function Post(props) {
     history.push('/topic/' + props.post.topic);
   };
 
-  const updateComments = () => {
+  const updateComments = async () => {
     try {
-      axios
+      await axios
         .get(
           'https://cs307circle-production.herokuapp.com/api/listComments',
           {
