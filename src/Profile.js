@@ -154,6 +154,7 @@ export default function Profile(props) {
   const [currentListOfFollowing, setCurrentListOfFollowing] = React.useState([]);
   const [currentUserFollowRequestedUser, setCurrentUserFollowRequestedUser] = React.useState(false);
   const [followButtonMessage, setFollowButtonMessage] = React.useState('');
+  const [loggedIn, setLoggedIn] = React.useState(false);
 
   // if url does not include requested user
   if (requestedUser === null || requestedUser === '' || requestedUser === undefined) {
@@ -173,6 +174,9 @@ export default function Profile(props) {
     setAppBar();
     getRequestedUser(requestedUser);
     getcurrentUser(currentUser);
+    if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '')
+      setLoggedIn(false);
+    else setLoggedIn(true);
   }, [props, requestedUser, currentUser]);
 
   useEffect(() => {
@@ -424,6 +428,7 @@ export default function Profile(props) {
                         variant='outlined'
                         style={{ marginLeft: '1rem' }}
                         onClick={currentUserFollowRequestedUser ? unfollowUser : followUser}
+                        disabled={!loggedIn}
                         classes={{
                           root: classes.button,
                           label: classes.buttonLabel,

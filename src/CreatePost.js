@@ -112,7 +112,10 @@ export default function CreatePost(props) {
       // TODO: err handle
       reader.onabort = () => console.log('file reading was aborted');
       reader.onerror = () => console.log('file reading has failed');
-      reader.onloadend = () => setUploadedFiles((current) => [...current, reader.result]);
+      reader.onloadend = () => {
+        setUploadedFiles((current) => [...current, reader.result]);
+        console.log(reader.result);
+      }
       reader.readAsDataURL(file);
     });
   }, []);

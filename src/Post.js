@@ -24,6 +24,8 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import CommentIcon from '@material-ui/icons/Comment';
 import { red } from '@material-ui/core/colors';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import BookmarkBorderIcon from '@material-ui/icons/BookmarkBorder';
+import BookmarkIcon from '@material-ui/icons/Bookmark';
 import Collapse from '@material-ui/core/Collapse';
 import clsx from 'clsx';
 import axios from 'axios';
@@ -93,15 +95,29 @@ export default function Post(props) {
   const [newComment, setNewComment] = React.useState('');
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
+  const [saved, setSaved] = React.useState('');
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [alertSeverity, setAlertSeverity] = React.useState('error');
+  const [savedPost, setSavedPost] = React.useState([]);
 
   useEffect(() => {
     if (props.post.votes !== undefined) setVotes(props.post.votes);
     updateComments();
     if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '') {
+      setLoggedIn(false);
       setDisableDownvote(true);
       setDisableUpvote(true);
+    } else {
+      setLoggedIn(true);
+      updateSavedPost();
     }
   }, [props]);
+
+  useEffect(() => {
+    savedPost.forEach((post) => {
+      if (post._id.$oid === props.post._id.$oid) setSaved(true);
+    });
+  }, [savedPost]);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -109,6 +125,21 @@ export default function Post(props) {
 
   const handleClickAvatar = () => {
     history.push('/topic/' + props.post.topic);
+  };
+
+  const updateSavedPost = async () => {
+    try {
+      await axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/listSavedPosts',
+          {
+            params: { username: localStorage.getItem('user') },
+          },
+          headers
+        )
+        .then((res) => setSavedPost(res.data))
+        .catch((err) => {});
+    } catch (err) {}
   };
 
   const updateComments = async () => {
@@ -162,8 +193,9 @@ export default function Post(props) {
 
   const postComment = async () => {
     if (newComment.length > 200) {
-      setAlertOpen(true);
+      setAlertSeverity('error');
       setAlertMessage('Comment must be shorter than 200 characters.');
+      setAlertOpen(true);
       return;
     }
     var data = {
@@ -175,9 +207,9 @@ export default function Post(props) {
       await axios.post('https://cs307circle-production.herokuapp.com/api/createComment', data, headers);
       updateComments();
     } catch (err) {
-      console.log(err.response.data);
-      setAlertOpen(true);
+      setAlertSeverity('error');
       setAlertMessage(err.response.data);
+      setAlertOpen(true);
     }
     setNewComment('');
   };
@@ -193,10 +225,31 @@ export default function Post(props) {
     setAlertOpen(false);
   };
 
+  const savePost = async () => {
+    var url;
+    var data = {
+      username: localStorage.getItem('user'),
+      post_oid: props.post._id.$oid,
+    };
+    if (saved) url = 'https://cs307circle-production.herokuapp.com/api/unsavePost';
+    else url = 'https://cs307circle-production.herokuapp.com/api/savePost';
+    try {
+      await axios.put(url, data, headers);
+      setAlertSeverity('success');
+      setAlertMessage(saved ? 'Unsaved!' : 'Saved!');
+      setAlertOpen(true);
+    } catch (err) {
+      setAlertSeverity('error');
+      setAlertMessage('Could not save, try again later');
+    }
+    updateSavedPost();
+    setSaved(!saved);
+  };
+
   return (
     <>
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={handleAlertClose} severity='error'>
+        <Alert onClose={handleAlertClose} severity={alertSeverity}>
           {alertMessage}
         </Alert>
       </Snackbar>
@@ -210,8 +263,8 @@ export default function Post(props) {
             </IconButton>
           }
           action={
-            <IconButton aria-label='settings'>
-              <MoreVertIcon />
+            <IconButton aria-label='settings' onClick={savePost} disabled={!loggedIn}>
+              {saved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
             </IconButton>
           }
           title={

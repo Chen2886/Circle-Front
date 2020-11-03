@@ -43,6 +43,7 @@ import CreatePost from './CreatePost.js';
 import Page404 from './404.js';
 import Topic from './Topic.js';
 import Alert from './Alert.js';
+import SavedPost from './SavedPost.js';
 import { sha256 } from 'js-sha256';
 
 const useStyles = makeStyles((theme) => ({
@@ -311,6 +312,9 @@ export default function App() {
                                 <ListItem button key='New Post' component={Link} to='/CreatePost'>
                                   <ListItemText primary='New Post' />
                                 </ListItem>
+                                <ListItem button key='Saved Post' component={Link} to='/savedPost'>
+                                  <ListItemText primary='Saved Post' />
+                                </ListItem>
                               </List>
                             </Drawer>
                           </td>
@@ -411,6 +415,11 @@ export default function App() {
             exact
             path='/topic/:topic'
             component={() => <Topic setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
+          />
+          <Route
+            exact
+            path='/savedPost'
+            component={() => <SavedPost setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
           <Route exact path='/404' component={() => <Page404></Page404>} />
         </Switch>

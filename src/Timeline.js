@@ -33,15 +33,50 @@ export default function Timeline(props) {
 
   useEffect(() => {
     var data = {};
-    if (props.user !== undefined && props.user !== null) {
-      data = {
-        author: props.user,
-      };
-    } else if (props.topic !== undefined && props.topic !== null) {
-      data = {
-        topic: props.topic,
-      };
-    } else if ((props.user === undefined || props.user === null) && (props.topic === undefined || props.topic === null)) {
+
+    // user's customize timeline
+    if (props.timeline !== undefined && props.timeline !== null) {
+      data = { username: props.timeline };
+      axios
+        .get('https://cs307circle-production.herokuapp.com/api/getUserTimeline', { params: data }, headers)
+        .then(function (res) {
+          var sortedPosts = res.data.sort(function (a, b) {
+            return b.dateAndTime.$date - a.dateAndTime.$date;
+          });
+          setPosts(sortedPosts);
+          setNumOfPosts(sortedPosts.length);
+          if (sortedPosts.length === 0) setHasMore(false);
+        })
+        .catch(function (err) {
+          setAlertOpen(true);
+          setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
+          setHasMore(false);
+        });
+      return;
+    }
+
+    if (props.savedPost !== undefined && props.savedPost !== null) {
+      data = { username: props.savedPost };
+      axios
+        .get('https://cs307circle-production.herokuapp.com/api/listSavedPosts', { params: data }, headers)
+        .then(function (res) {
+          var sortedPosts = res.data.sort(function (a, b) {
+            return b.dateAndTime.$date - a.dateAndTime.$date;
+          });
+          setPosts(sortedPosts);
+          setNumOfPosts(sortedPosts.length);
+          if (sortedPosts.length === 0) setHasMore(false);
+        })
+        .catch(function (err) {
+          setAlertOpen(true);
+          setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
+          setHasMore(false);
+        });
+      return;
+    }
+
+    // all post timeline
+    if ((props.user === undefined || props.user === null) && (props.topic === undefined || props.topic === null)) {
       axios
         .get('https://cs307circle-production.herokuapp.com/api/getAllPosts', headers)
         .then(function (res) {
@@ -59,14 +94,13 @@ export default function Timeline(props) {
         });
       return;
     }
+
+    // regular timeline
+    if (props.user !== undefined && props.user !== null) data = { author: props.user };
+    else if (props.topic !== undefined && props.topic !== null) data = { topic: props.topic };
+
     axios
-      .get(
-        'https://cs307circle-production.herokuapp.com/api/listPost',
-        {
-          params: data,
-        },
-        headers
-      )
+      .get('https://cs307circle-production.herokuapp.com/api/listPost', { params: data }, headers)
       .then(function (res) {
         var sortedPosts = res.data.sort(function (a, b) {
           return b.dateAndTime.$date - a.dateAndTime.$date;
