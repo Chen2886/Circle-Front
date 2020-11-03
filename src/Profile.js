@@ -246,6 +246,8 @@ export default function Profile(props) {
           setEmail(res.data.email);
           setLastUpdatedEmail(res.data.email);
           setLastUpdatedBio(res.data.bio);
+          setListOfFollowers(res.listOfFollowers);
+          setListOfFollowing(res.listOfFollowing);
         })
         .catch((err) => {
           setAlertSeverity('error');
@@ -377,6 +379,8 @@ export default function Profile(props) {
     };
     await axios.put('https://cs307circle-production.herokuapp.com/api/followUser', data, headers);
     await updateListOfFollowing(currentUser, setCurrentListOfFollowing);
+    await updateListOfFollowers(currentUser, setCurrentListOfFollowers);
+    await updateListOfFollowing(requestedUser, setListOfFollowing);
     await updateListOfFollowers(requestedUser, setListOfFollowers);
   };
 
@@ -387,6 +391,8 @@ export default function Profile(props) {
     };
     await axios.put('https://cs307circle-production.herokuapp.com/api/unfollowUser', data, headers);
     await updateListOfFollowing(currentUser, setCurrentListOfFollowing);
+    await updateListOfFollowers(currentUser, setCurrentListOfFollowers);
+    await updateListOfFollowing(requestedUser, setListOfFollowing);
     await updateListOfFollowers(requestedUser, setListOfFollowers);
   };
 
@@ -439,11 +445,11 @@ export default function Profile(props) {
                   </div>
                   <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
                     <Typography variant='h6' style={{ float: 'left' }}>
-                      {requestedUserObj === undefined || requestedUserObj.listOfFollowers === undefined ? 0 : requestedUserObj.listOfFollowers.length}{' '}
+                      {requestedUserObj === undefined || requestedUserObj.listOfFollowers === undefined ? 0 : listOfFollowers.length}{' '}
                       Followers
                     </Typography>
                     <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
-                      {requestedUserObj === undefined || requestedUserObj.listOfFollowing === undefined ? 0 : requestedUserObj.listOfFollowing.length}{' '}
+                      {requestedUserObj === undefined || requestedUserObj.listOfFollowing === undefined ? 0 : listOfFollowing.length}{' '}
                       Following
                     </Typography>
                     <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
