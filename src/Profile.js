@@ -405,6 +405,10 @@ export default function Profile(props) {
     setFollowButtonMessage(temp ? 'UNFOLLOW' : 'FOLLOW');
   };
 
+  const circleClicked = (topic) => history.push('/topic/' + topic);
+
+  const userClicked = (username) => history.push('/profile/' + username);
+
   return (
     <>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -445,12 +449,10 @@ export default function Profile(props) {
                   </div>
                   <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
                     <Typography variant='h6' style={{ float: 'left' }}>
-                      {requestedUserObj === undefined || requestedUserObj.listOfFollowers === undefined ? 0 : listOfFollowers.length}{' '}
-                      Followers
+                      {requestedUserObj === undefined || requestedUserObj.listOfFollowers === undefined ? 0 : listOfFollowers.length} Followers
                     </Typography>
                     <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
-                      {requestedUserObj === undefined || requestedUserObj.listOfFollowing === undefined ? 0 : listOfFollowing.length}{' '}
-                      Following
+                      {requestedUserObj === undefined || requestedUserObj.listOfFollowing === undefined ? 0 : listOfFollowing.length} Following
                     </Typography>
                     <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
                       {requestedUserObj === undefined || requestedUserObj.listOfTopics === undefined ? 0 : requestedUserObj.listOfTopics.length}{' '}
@@ -527,7 +529,8 @@ export default function Profile(props) {
                       size='medium'
                       color='primary'
                       label={circle.topic}
-                      key={i}
+                      key={circle.topic}
+                      onClick={() => circleClicked(circle.topic)}
                     />
                   ))}
               </div>
@@ -555,7 +558,8 @@ export default function Profile(props) {
                           size='medium'
                           color='primary'
                           label={following.username}
-                          key={i}
+                          key={following.username}
+                          onClick={() => userClicked(following.username)}
                         />
                       ))}
                   </div>
@@ -583,7 +587,8 @@ export default function Profile(props) {
                           size='medium'
                           color='primary'
                           label={follower.username}
-                          key={i}
+                          key={follower.username}
+                          onClick={userClicked}
                         />
                       ))}
                   </div>
