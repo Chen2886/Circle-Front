@@ -523,7 +523,6 @@ export default function Profile(props) {
                       classes={{
                         label: classes.chipLabel,
                       }}
-                      key={circle}
                       variant='outlined'
                       avatar={<Avatar>{circle.topic.charAt(0).toUpperCase()}</Avatar>}
                       size='medium'
@@ -552,7 +551,6 @@ export default function Profile(props) {
                           classes={{
                             label: classes.chipLabel,
                           }}
-                          key={following}
                           variant='outlined'
                           avatar={<Avatar>{following.username.charAt(0).toUpperCase()}</Avatar>}
                           size='medium'
@@ -581,7 +579,6 @@ export default function Profile(props) {
                           classes={{
                             label: classes.chipLabel,
                           }}
-                          key={follower}
                           variant='outlined'
                           avatar={<Avatar>{follower.username.charAt(0).toUpperCase()}</Avatar>}
                           size='medium'
