@@ -518,7 +518,7 @@ export default function Profile(props) {
               <div className={classes.followedCircles}>
                 {circles.length === 0 && <Typography variant='h5'>No CIRCLEs.</Typography>}
                 {circles.length !== 0 &&
-                  circles.map((circle, i) => (
+                  circles.map((circle) => (
                     <Chip
                       classes={{
                         label: classes.chipLabel,
@@ -546,7 +546,7 @@ export default function Profile(props) {
                   <div className={classes.followedCircles}>
                     {listOfFollowing.length === 0 && <Typography variant='h5'>No followings</Typography>}
                     {listOfFollowing.length !== 0 &&
-                      listOfFollowing.map((following, i) => (
+                      listOfFollowing.map((following) => (
                         <Chip
                           classes={{
                             label: classes.chipLabel,
@@ -574,7 +574,7 @@ export default function Profile(props) {
                   <div className={classes.followedCircles}>
                     {listOfFollowers.length === 0 && <Typography variant='h5'>No Followers</Typography>}
                     {listOfFollowers.length !== 0 &&
-                      listOfFollowers.map((follower, i) => (
+                      listOfFollowers.map((follower) => (
                         <Chip
                           classes={{
                             label: classes.chipLabel,
