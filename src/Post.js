@@ -9,7 +9,6 @@ import {
   CardContent,
   CardActions,
   Divider,
-  Input,
   InputAdornment,
   OutlinedInput,
   InputLabel,
@@ -19,7 +18,6 @@ import {
 import { useHistory } from 'react-router-dom';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import { makeStyles } from '@material-ui/core/styles';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import CommentIcon from '@material-ui/icons/Comment';
 import { red } from '@material-ui/core/colors';
@@ -117,7 +115,7 @@ export default function Post(props) {
     savedPost.forEach((post) => {
       if (post._id.$oid === props.post._id.$oid) setSaved(true);
     });
-  }, [savedPost]);
+  }, [savedPost, props]);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);

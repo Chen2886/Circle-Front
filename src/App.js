@@ -44,7 +44,6 @@ import Page404 from './404.js';
 import Topic from './Topic.js';
 import Alert from './Alert.js';
 import SavedPost from './SavedPost.js';
-import { sha256 } from 'js-sha256';
 
 const useStyles = makeStyles((theme) => ({
   root: {

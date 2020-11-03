@@ -149,10 +149,6 @@ export default function CreatePost(props) {
       text: textContent,
       topic: textCircle,
     };
-    var headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'application/json',
-    };
 
     // show loading
     setLoading(true);
