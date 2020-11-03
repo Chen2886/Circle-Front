@@ -433,12 +433,11 @@ export default function Profile(props) {
                     <Typography variant='h4' style={{ float: 'left' }}>
                       {requestedUserObj === null ? '' : requestedUserObj.username}
                     </Typography>
-                    {requestedUser !== currentUserObj.username && (
+                    {requestedUser !== currentUserObj.username && loggedIn && (
                       <Button
                         variant='outlined'
                         style={{ marginLeft: '1rem' }}
                         onClick={currentUserFollowRequestedUser ? unfollowUser : followUser}
-                        disabled={!loggedIn}
                         classes={{
                           root: classes.button,
                           label: classes.buttonLabel,
@@ -449,10 +448,10 @@ export default function Profile(props) {
                   </div>
                   <div className={classes.flexDisplay} style={{ marginTop: '1rem' }}>
                     <Typography variant='h6' style={{ float: 'left' }}>
-                      {requestedUserObj === undefined || requestedUserObj.listOfFollowers === undefined ? 0 : listOfFollowers.length} Followers
+                      {listOfFollowers === undefined ? 0 : listOfFollowers.length} Followers
                     </Typography>
                     <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
-                      {requestedUserObj === undefined || requestedUserObj.listOfFollowing === undefined ? 0 : listOfFollowing.length} Following
+                      {listOfFollowing === undefined ? 0 : listOfFollowing.length} Following
                     </Typography>
                     <Typography variant='h6' style={{ float: 'left', marginLeft: '2rem' }}>
                       {requestedUserObj === undefined || requestedUserObj.listOfTopics === undefined ? 0 : requestedUserObj.listOfTopics.length}{' '}
@@ -544,8 +543,9 @@ export default function Profile(props) {
                 </Typography>
                 <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
                   <div className={classes.followedCircles}>
-                    {listOfFollowing.length === 0 && <Typography variant='h5'>No followings</Typography>}
-                    {listOfFollowing.length !== 0 &&
+                    {(listOfFollowing === undefined || listOfFollowing.length === 0) && <Typography variant='h5'>No followings</Typography>}
+                    {listOfFollowers !== undefined &&
+                      listOfFollowers.length !== 0 &&
                       listOfFollowing.map((following) => (
                         <Chip
                           classes={{
@@ -572,8 +572,9 @@ export default function Profile(props) {
                 </Typography>
                 <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
                   <div className={classes.followedCircles}>
-                    {listOfFollowers.length === 0 && <Typography variant='h5'>No Followers</Typography>}
-                    {listOfFollowers.length !== 0 &&
+                    {(listOfFollowers === undefined || listOfFollowers.length === 0) && <Typography variant='h5'>No Followers</Typography>}
+                    {listOfFollowers !== undefined &&
+                      listOfFollowers.length !== 0 &&
                       listOfFollowers.map((follower) => (
                         <Chip
                           classes={{
