@@ -129,7 +129,7 @@ export default function Timeline(props) {
       </Snackbar>
       <Grid container alignItems='center' justify='center' className={classes.container}>
         <Grid item xs={12} md={8}>
-          {posts.length !== 0 && (
+          {(posts.length !== 0 || hasMore) && (
             <InfiniteScroll
               dataLength={numOfPosts}
               next={fetchMoreData}
@@ -146,7 +146,7 @@ export default function Timeline(props) {
               })}
             </InfiniteScroll>
           )}
-          {posts.length === 0 && (
+          {posts.length === 0 && !hasMore && (
             <Grid container alignItems='center' justify='center' style={{ marginTop: '5rem', marginBottom: '5rem' }}>
               <Grid item>
                 <Typography variant='h6'>No posts available! Go make one.</Typography>

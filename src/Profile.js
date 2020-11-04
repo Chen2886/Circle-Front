@@ -544,8 +544,8 @@ export default function Profile(props) {
                 <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
                   <div className={classes.followedCircles}>
                     {(listOfFollowing === undefined || listOfFollowing.length === 0) && <Typography variant='h5'>No followings</Typography>}
-                    {listOfFollowers !== undefined &&
-                      listOfFollowers.length !== 0 &&
+                    {listOfFollowing !== undefined &&
+                      listOfFollowing.length !== 0 &&
                       listOfFollowing.map((following) => (
                         <Chip
                           classes={{
@@ -586,7 +586,7 @@ export default function Profile(props) {
                           color='primary'
                           label={follower.username}
                           key={follower.username}
-                          onClick={userClicked}
+                          onClick={() => userClicked(follower.username)}
                         />
                       ))}
                   </div>
