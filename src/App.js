@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import axios from 'axios';
+import sha256 from 'js-sha256';
 
 import { ThemeProvider } from '@material-ui/styles';
 import {
@@ -44,6 +45,7 @@ import Page404 from './404.js';
 import Topic from './Topic.js';
 import Alert from './Alert.js';
 import SavedPost from './SavedPost.js';
+import UserLine from './UserLine.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -168,11 +170,13 @@ export default function App() {
   const handleRedirectToProfilePage = () => {
     setAnchorEl(null);
   };
+
   const handleLogout = () => {
     localStorage.removeItem('user');
     setCurrentUser(localStorage.getItem('user'));
     setAnchorEl(null);
   };
+
   const handleDeleteAccount = () => {
     if (currentUser === null) {
       setRedirectToLogin(true);
@@ -203,9 +207,17 @@ export default function App() {
     setDeleteDialogOpen(false);
   };
   const handleConfirmDeleteDialog = () => {
-    // TODO: API delete account
-    console.log(currentUser);
-    console.log(deleteAccountPassword);
+    if (currentUser === null || currentUser === undefined || currentUser === '') return;
+    axios
+      .delete(
+        'https://cs307circle-production.herokuapp.com/api/deleteUser',
+        {
+          params: { username: currentUser, password: sha256(deleteAccountPassword) },
+        },
+        headers
+      )
+      .then((res) => handleLogout())
+      .catch((err) => console.log(err));
     setDeleteDialogOpen(false);
   };
 
@@ -216,6 +228,11 @@ export default function App() {
 
   const handleSearch = async (event) => {
     if (event.key === 'Enter') {
+      if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '') {
+        setAlertMessage('You are not logged in!');
+        setAlertOpen(true);
+        return;
+      }
       var userFailuer = false;
       var topicFailuer = false;
       try {
@@ -314,6 +331,9 @@ export default function App() {
                                 <ListItem button key='Saved Post' component={Link} to='/savedPost'>
                                   <ListItemText primary='Saved Post' />
                                 </ListItem>
+                                <ListItem button key='User Line' component={Link} to='/userLine'>
+                                  <ListItemText primary='User Line' />
+                                </ListItem>
                               </List>
                             </Drawer>
                           </td>
@@ -381,7 +401,9 @@ export default function App() {
               <MenuItem onClick={handleRedirectToProfilePage} component={Link} to={'/profile/' + currentUser}>
                 Profile
               </MenuItem>
-              <MenuItem onClick={handleDeleteAccount}>Delete Account</MenuItem>
+              {localStorage.getItem('user') !== undefined && localStorage.getItem('user') !== '' && (
+                <MenuItem onClick={handleDeleteAccount}>Delete Account</MenuItem>
+              )}
               <MenuItem onClick={handleLogout} component={Link} to='/'>
                 Logout
               </MenuItem>
@@ -419,6 +441,11 @@ export default function App() {
             exact
             path='/savedPost'
             component={() => <SavedPost setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
+          />
+          <Route
+            exact
+            path='/userLine'
+            component={() => <UserLine setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
           <Route exact path='/404' component={() => <Page404></Page404>} />
         </Switch>

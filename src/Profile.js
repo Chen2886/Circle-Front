@@ -508,92 +508,96 @@ export default function Profile(props) {
               </Grid>
             )}
           </Grid>
-          <Card className={classes.infoCard}>
-            <Divider variant='middle' />
-            <Typography variant='h6' className={classes.infoTitle}>
-              Followed Circles
-            </Typography>
-            <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
-              <div className={classes.followedCircles}>
-                {circles.length === 0 && <Typography variant='h5'>No CIRCLEs.</Typography>}
-                {circles.length !== 0 &&
-                  circles.map((circle) => (
-                    <Chip
-                      classes={{
-                        label: classes.chipLabel,
-                      }}
-                      variant='outlined'
-                      avatar={<Avatar>{circle.topic.charAt(0).toUpperCase()}</Avatar>}
-                      size='medium'
-                      color='primary'
-                      label={circle.topic}
-                      key={circle.topic}
-                      onClick={() => circleClicked(circle.topic)}
-                    />
-                  ))}
-              </div>
-            </div>
-          </Card>
-          <Grid container>
-            <Grid item xs={12} md={6}>
+          {loggedIn && (
+            <>
               <Card className={classes.infoCard}>
                 <Divider variant='middle' />
                 <Typography variant='h6' className={classes.infoTitle}>
-                  Following
+                  Followed Circles
                 </Typography>
                 <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
                   <div className={classes.followedCircles}>
-                    {(listOfFollowing === undefined || listOfFollowing.length === 0) && <Typography variant='h5'>No followings</Typography>}
-                    {listOfFollowing !== undefined &&
-                      listOfFollowing.length !== 0 &&
-                      listOfFollowing.map((following) => (
+                    {circles.length === 0 && <Typography variant='h5'>No CIRCLEs.</Typography>}
+                    {circles.length !== 0 &&
+                      circles.map((circle) => (
                         <Chip
                           classes={{
                             label: classes.chipLabel,
                           }}
                           variant='outlined'
-                          avatar={<Avatar>{following.username.charAt(0).toUpperCase()}</Avatar>}
+                          avatar={<Avatar>{circle.topic.charAt(0).toUpperCase()}</Avatar>}
                           size='medium'
                           color='primary'
-                          label={following.username}
-                          key={following.username}
-                          onClick={() => userClicked(following.username)}
+                          label={circle.topic}
+                          key={circle.topic}
+                          onClick={() => circleClicked(circle.topic)}
                         />
                       ))}
                   </div>
                 </div>
               </Card>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Card className={classes.infoCard}>
-                <Divider variant='middle' />
-                <Typography variant='h6' className={classes.infoTitle}>
-                  Follower
-                </Typography>
-                <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
-                  <div className={classes.followedCircles}>
-                    {(listOfFollowers === undefined || listOfFollowers.length === 0) && <Typography variant='h5'>No Followers</Typography>}
-                    {listOfFollowers !== undefined &&
-                      listOfFollowers.length !== 0 &&
-                      listOfFollowers.map((follower) => (
-                        <Chip
-                          classes={{
-                            label: classes.chipLabel,
-                          }}
-                          variant='outlined'
-                          avatar={<Avatar>{follower.username.charAt(0).toUpperCase()}</Avatar>}
-                          size='medium'
-                          color='primary'
-                          label={follower.username}
-                          key={follower.username}
-                          onClick={() => userClicked(follower.username)}
-                        />
-                      ))}
-                  </div>
-                </div>
-              </Card>
-            </Grid>
-          </Grid>
+              <Grid container>
+                <Grid item xs={12} md={6}>
+                  <Card className={classes.infoCard}>
+                    <Divider variant='middle' />
+                    <Typography variant='h6' className={classes.infoTitle}>
+                      Following
+                    </Typography>
+                    <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                      <div className={classes.followedCircles}>
+                        {(listOfFollowing === undefined || listOfFollowing.length === 0) && <Typography variant='h5'>No followings</Typography>}
+                        {listOfFollowing !== undefined &&
+                          listOfFollowing.length !== 0 &&
+                          listOfFollowing.map((following) => (
+                            <Chip
+                              classes={{
+                                label: classes.chipLabel,
+                              }}
+                              variant='outlined'
+                              avatar={<Avatar>{following.username.charAt(0).toUpperCase()}</Avatar>}
+                              size='medium'
+                              color='primary'
+                              label={following.username}
+                              key={following.username}
+                              onClick={() => userClicked(following.username)}
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Card className={classes.infoCard}>
+                    <Divider variant='middle' />
+                    <Typography variant='h6' className={classes.infoTitle}>
+                      Follower
+                    </Typography>
+                    <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                      <div className={classes.followedCircles}>
+                        {(listOfFollowers === undefined || listOfFollowers.length === 0) && <Typography variant='h5'>No Followers</Typography>}
+                        {listOfFollowers !== undefined &&
+                          listOfFollowers.length !== 0 &&
+                          listOfFollowers.map((follower) => (
+                            <Chip
+                              classes={{
+                                label: classes.chipLabel,
+                              }}
+                              variant='outlined'
+                              avatar={<Avatar>{follower.username.charAt(0).toUpperCase()}</Avatar>}
+                              size='medium'
+                              color='primary'
+                              label={follower.username}
+                              key={follower.username}
+                              onClick={() => userClicked(follower.username)}
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  </Card>
+                </Grid>
+              </Grid>
+            </>
+          )}
           <Timeline user={requestedUser}></Timeline>
         </>
       )}

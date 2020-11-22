@@ -73,7 +73,9 @@ export default function Profile(props) {
       username: localStorage.getItem('user'),
       topic: topic,
     };
-    await axios.put('https://cs307circle-production.herokuapp.com/api/unfollowTopic', data, headers);
+    await axios.put('https://cs307circle-production.herokuapp.com/api/unfollowTopic', data, headers).catch(function (err) {
+      return;
+    });
     await updateTopics();
   };
 
@@ -82,7 +84,9 @@ export default function Profile(props) {
       username: localStorage.getItem('user'),
       topic: topic,
     };
-    await axios.put('https://cs307circle-production.herokuapp.com/api/followTopic', data, headers);
+    await axios.put('https://cs307circle-production.herokuapp.com/api/followTopic', data, headers).catch(function (err) {
+      return;
+    });
     await updateTopics();
   };
 

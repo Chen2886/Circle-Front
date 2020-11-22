@@ -142,7 +142,7 @@ export default function Post(props) {
 
   const updateComments = async () => {
     try {
-      await axios
+      axios
         .get(
           'https://cs307circle-production.herokuapp.com/api/listComments',
           {
@@ -201,14 +201,18 @@ export default function Post(props) {
       author: localStorage.getItem('user'),
       comment: newComment,
     };
-    try {
-      await axios.post('https://cs307circle-production.herokuapp.com/api/createComment', data, headers);
-      updateComments();
-    } catch (err) {
-      setAlertSeverity('error');
-      setAlertMessage(err.response.data);
-      setAlertOpen(true);
-    }
+
+    axios
+      .post('https://cs307circle-production.herokuapp.com/api/createComment', data, headers)
+      .then(function () {
+        updateComments();
+      })
+      .catch(function (err) {
+        setAlertSeverity('error');
+        setAlertMessage(err.response.data);
+        setAlertOpen(true);
+      });
+
     setNewComment('');
   };
 

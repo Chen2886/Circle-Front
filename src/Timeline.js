@@ -2,7 +2,7 @@ import './App.css';
 import Post from './Post.js';
 import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Grid, CircularProgress, Snackbar, Typography } from '@material-ui/core';
+import { Grid, CircularProgress, Snackbar, Typography, Backdrop } from '@material-ui/core';
 import axios from 'axios';
 import Alert from './Alert.js';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -25,6 +25,8 @@ export default function Timeline(props) {
   const [alertMessage, setAlertMessage] = React.useState('');
   const [numOfPosts, setNumOfPosts] = React.useState(0);
   const [hasMore, setHasMore] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
+  const [filter, setfilter] = React.useState({});
 
   const handleAlertClose = (event, reason) => {
     if (reason === 'clickaway') return;
@@ -32,6 +34,16 @@ export default function Timeline(props) {
   };
 
   useEffect(() => {
+    if (filter === props.filter || posts.length > 0) {
+      return;
+    }
+    if (filter !== props.filter) {
+      setfilter(props.filter);
+    }
+
+    console.log('loading new posts.');
+
+    setLoading(true);
     var data = {};
 
     // user's customize timeline
@@ -43,15 +55,33 @@ export default function Timeline(props) {
           var sortedPosts = res.data.sort(function (a, b) {
             return b.dateAndTime.$date - a.dateAndTime.$date;
           });
+          if (props.filter !== undefined || props.filter !== null) {
+            var filter = [];
+            for (const [key, value] of Object.entries(props.filter)) {
+              if (value === 'outlined') filter.push(key);
+            }
+            sortedPosts = sortedPosts.filter((post) => {
+              return !filter.includes(post.topic) || post.author === localStorage.getItem('user');
+            });
+          }
+
           setPosts(sortedPosts);
           setNumOfPosts(sortedPosts.length);
           if (sortedPosts.length === 0) setHasMore(false);
         })
         .catch(function (err) {
+          if (
+            err.response !== undefined &&
+            err.response.data === 'This user has not made any posts, does not follow anyone, and does not follow any topics.'
+          ) {
+            setHasMore(false);
+            return;
+          }
           setAlertOpen(true);
           setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
           setHasMore(false);
         });
+      setLoading(false);
       return;
     }
 
@@ -72,6 +102,7 @@ export default function Timeline(props) {
           setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
           setHasMore(false);
         });
+      setLoading(false);
       return;
     }
 
@@ -92,6 +123,7 @@ export default function Timeline(props) {
           setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
           setHasMore(false);
         });
+      setLoading(false);
       return;
     }
 
@@ -114,6 +146,7 @@ export default function Timeline(props) {
         setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
         setHasMore(false);
       });
+    setLoading(false);
   }, [props]);
 
   const fetchMoreData = () => {
@@ -127,6 +160,9 @@ export default function Timeline(props) {
           {alertMessage}
         </Alert>
       </Snackbar>
+      <Backdrop className={classes.backdrop} open={loading} onClick={() => setLoading(false)}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
       <Grid container alignItems='center' justify='center' className={classes.container}>
         <Grid item xs={12} md={8}>
           {(posts.length !== 0 || hasMore) && (

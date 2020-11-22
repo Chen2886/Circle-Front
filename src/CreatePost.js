@@ -20,6 +20,11 @@ import {
   Backdrop,
   CircularProgress,
   Snackbar,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -84,6 +89,7 @@ export default function CreatePost(props) {
   const [uploadedFiles, setUploadedFiles] = React.useState([]);
   const [openPreview, setOpenPreview] = React.useState(false);
   const [imgSrc, setImgSrc] = React.useState();
+  const [alertSeverity, setAlertSeverity] = React.useState('error');
 
   // text post hook
   const [textCircle, setTextCircle] = React.useState('');
@@ -93,6 +99,7 @@ export default function CreatePost(props) {
   const [loading, setLoading] = React.useState(false);
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const handleCancel = () => history.push('/');
 
   const handleClickOpenPreview = () => setOpenPreview(true);
@@ -114,8 +121,7 @@ export default function CreatePost(props) {
       reader.onerror = () => console.log('file reading has failed');
       reader.onloadend = () => {
         setUploadedFiles((current) => [...current, reader.result]);
-        console.log(reader.result);
-      }
+      };
       reader.readAsDataURL(file);
     });
   }, []);
@@ -132,19 +138,50 @@ export default function CreatePost(props) {
     setAppBar();
   }, [props]);
 
-  const handlePost = () => {
-    // TODO
-    history.push('/');
-  };
-
-  const handlePostText = async () => {
+  const handlePost = async (anon) => {
+    if (uploadedFiles.length === 0) handlePostText();
     // if any fields are empty
     if (textCircle === '' || textContent === '' || textTitle === '') {
       setMissingRequired(true);
       return;
     }
     var data = {
-      author: localStorage.getItem('user'),
+      author: anon ? 'anonymous user' : localStorage.getItem('user'),
+      title: textTitle,
+      text: textContent,
+      topic: textCircle,
+      image: uploadedFiles,
+    };
+
+    // show loading
+    setLoading(true);
+
+    try {
+      await axios.post('https://cs307circle-production.herokuapp.com/api/createPost', data, headers);
+      setLoading(false);
+      if (anon) {
+        setAlertMessage('You posted anonymously. Your post will not show up in your timeline, only the topic timeline.');
+        setAlertSeverity('success');
+        setAlertOpen(true);
+      }
+      history.push('/');
+    } catch (err) {
+      setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
+      setLoading(false);
+      setAlertSeverity('error');
+      setAlertOpen(true);
+      return;
+    }
+  };
+
+  const handlePostText = async (anon) => {
+    // if any fields are empty
+    if (textCircle === '' || textContent === '' || textTitle === '') {
+      setMissingRequired(true);
+      return;
+    }
+    var data = {
+      author: anon ? 'anonymous user' : localStorage.getItem('user'),
       title: textTitle,
       text: textContent,
       topic: textCircle,
@@ -156,11 +193,17 @@ export default function CreatePost(props) {
     try {
       await axios.post('https://cs307circle-production.herokuapp.com/api/createPost', data, headers);
       setLoading(false);
+      if (anon) {
+        setAlertMessage('You posted anonymously. Your post will not show up in your timeline, only the topic timeline.');
+        setAlertSeverity('success');
+        setAlertOpen(true);
+      }
       history.push('/');
     } catch (err) {
-      setAlertOpen(true);
       setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
       setLoading(false);
+      setAlertSeverity('error');
+      setAlertOpen(true);
       return;
     }
   };
@@ -172,8 +215,6 @@ export default function CreatePost(props) {
   const filePreview = (
     <Grid container direction='row' justify='center' alignItems='center' spacing={2}>
       {uploadedFiles.map((file, index) => {
-        console.log(index);
-        console.log(uploadedFiles.length - index - 1 < 3 && uploadedFiles.length % 3 !== 0 ? 12 / (uploadedFiles.length % 3) : 4);
         return (
           <Grid item xs={uploadedFiles.length - index - 1 < uploadedFiles.length % 3 ? 12 / (uploadedFiles.length % 3) : 4} key={index}>
             <img
@@ -191,8 +232,34 @@ export default function CreatePost(props) {
     </Grid>
   );
 
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+  };
+  const handleConfirmDeleteDialog = () => {
+    // TODO: API delete account
+    setDeleteDialogOpen(false);
+    if (tab === 0) handlePostText(true);
+    else handlePost(true);
+  };
+
   return (
     <>
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog} aria-labelledby='form-dialog-title'>
+        <DialogTitle id='form-dialog-title'>Post Anonymously?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to post anonymously? Your post will not show up in your timeline, only on a topic timeline.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDeleteDialog} color='primary'>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Backdrop open={openPreview} onClick={handleClosePreview} className={classes.backdrop}>
         <img src={imgSrc} className={classes.previewImg} />
       </Backdrop>
@@ -200,7 +267,7 @@ export default function CreatePost(props) {
         <CircularProgress color='inherit' />
       </Backdrop>
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={handleAlertClose} severity='error'>
+        <Alert onClose={handleAlertClose} severity={alertSeverity}>
           {alertMessage}
         </Alert>
       </Snackbar>
@@ -259,8 +326,11 @@ export default function CreatePost(props) {
                   />
                 </CardContent>
                 <CardActions>
-                  <Button color='primary' onClick={handlePostText}>
+                  <Button color='primary' onClick={() => handlePostText(false)}>
                     Post
+                  </Button>
+                  <Button color='primary' onClick={() => setDeleteDialogOpen(true)}>
+                    Post Anonymously
                   </Button>
                   <Button color='primary' onClick={handleCancel}>
                     Cancel
@@ -271,8 +341,35 @@ export default function CreatePost(props) {
             {tab === 1 && (
               <>
                 <CardContent>
-                  <TextField label='Circle' variant='outlined' fullWidth className={classes.textField} />
-                  <TextField label='Content' multiline fullWidth rows={10} variant='outlined' className={classes.textField} />
+                  <TextField
+                    label='Circle'
+                    variant='outlined'
+                    fullWidth
+                    className={classes.textField}
+                    onChange={handleTextCircleChange}
+                    value={textCircle}
+                    error={missingRequired && textCircle === ''}
+                  />
+                  <TextField
+                    label='Title'
+                    variant='outlined'
+                    fullWidth
+                    className={classes.textField}
+                    onChange={handleTextTitleChange}
+                    value={textTitle}
+                    error={missingRequired && textTitle === ''}
+                  />
+                  <TextField
+                    label='Content'
+                    multiline
+                    fullWidth
+                    rows={10}
+                    variant='outlined'
+                    className={classes.textField}
+                    onChange={handleTextContentChange}
+                    text={textContent}
+                    error={missingRequired && textContent === ''}
+                  />
                   <div {...getRootProps({ className: classes.uploadFileArea })}>
                     <input {...getInputProps()} />
                     <p>Drag 'n' drop some files here, or click to select files</p>
@@ -280,8 +377,11 @@ export default function CreatePost(props) {
                   {filePreview}
                 </CardContent>
                 <CardActions>
-                  <Button color='primary' onClick={handlePost}>
+                  <Button color='primary' onClick={() => handlePost(false)}>
                     Post
+                  </Button>
+                  <Button color='primary' onClick={() => setDeleteDialogOpen(true)}>
+                    Post Anonymously
                   </Button>
                   <Button color='primary' onClick={handleCancel}>
                     Cancel
