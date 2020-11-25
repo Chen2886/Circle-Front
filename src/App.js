@@ -46,6 +46,7 @@ import Topic from './Topic.js';
 import Alert from './Alert.js';
 import SavedPost from './SavedPost.js';
 import UserLine from './UserLine.js';
+import ChangePassword from './ChangePassword.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -159,6 +160,9 @@ export default function App() {
   const [searchRedirect, setSearchRedirect] = React.useState(false);
   const [searchRedirectUrl, setSearchRedirectUrl] = React.useState('');
   const [searchValue, setSearchValue] = React.useState('');
+  const [changePasswordDialogOpen, setChangePasswordDialogOpen] = React.useState(false);
+  const [changePasswordOld, setChangePasswordOld] = React.useState('');
+  const [changePasswordNew, setChangePasswordNew] = React.useState('');
 
   window.onbeforeunload = () => {
     if (localStorage.getItem('rememberMe') !== 'true') localStorage.removeItem('user');
@@ -167,8 +171,14 @@ export default function App() {
   // user menu
   const handleOpenUserMenu = (event) => setAnchorEl(event.currentTarget);
   const handleCloseUserMenu = () => setAnchorEl(null);
-  const handleRedirectToProfilePage = () => {
+  const handleRedirectToProfilePage = () => setAnchorEl(null);
+  const handleChangePassword = () => {
     setAnchorEl(null);
+    if (currentUser === null) {
+      setRedirectToLogin(true);
+    } else {
+      setChangePasswordDialogOpen(true);
+    }
   };
 
   const handleLogout = () => {
@@ -178,6 +188,7 @@ export default function App() {
   };
 
   const handleDeleteAccount = () => {
+    setAnchorEl(null);
     if (currentUser === null) {
       setRedirectToLogin(true);
     } else {
@@ -206,6 +217,11 @@ export default function App() {
   const handleCloseDeleteDialog = () => {
     setDeleteDialogOpen(false);
   };
+
+  const handleCloseChangePasswordDialog = () => {
+    setChangePasswordDialogOpen(false);
+  };
+
   const handleConfirmDeleteDialog = () => {
     if (currentUser === null || currentUser === undefined || currentUser === '') return;
     axios
@@ -268,6 +284,27 @@ export default function App() {
 
   const handleDeletePasswordChange = (e) => setDeleteAccountPassword(e.target.value);
 
+  const handleChangePasswordOld = (e) => setChangePasswordOld(e.target.value);
+
+  const handleChangePasswordNew = (e) => setChangePasswordNew(e.target.value);
+
+  const handleConfirmChangePasswordDialog = () => {
+    console.log(changePasswordNew);
+    console.log(changePasswordOld);
+    if (currentUser === null || currentUser === undefined || currentUser === '') return;
+    axios
+      .delete(
+        'https://cs307circle-production.herokuapp.com/api/changePassword',
+        {
+          params: { username: currentUser, oldpass: sha256(changePasswordOld), newpass: sha256(changePasswordNew) },
+        },
+        headers
+      )
+      .then((res) => handleLogout())
+      .catch((err) => console.log(err));
+    setDeleteDialogOpen(false);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
@@ -296,6 +333,37 @@ export default function App() {
             Cancel
           </Button>
           <Button onClick={handleConfirmDeleteDialog} color='primary'>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={changePasswordDialogOpen} onClose={handleCloseChangePasswordDialog}>
+        <DialogTitle id='form-dialog-title'>Change Your Password?</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin='dense'
+            label='Old Password'
+            type='password'
+            fullWidth
+            value={changePasswordOld}
+            onChange={handleChangePasswordOld}
+          />
+          <TextField
+            autoFocus
+            margin='dense'
+            label='New Password'
+            type='password'
+            fullWidth
+            value={changePasswordNew}
+            onChange={handleChangePasswordNew}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseChangePasswordDialog} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmChangePasswordDialog} color='primary'>
             Confirm
           </Button>
         </DialogActions>
@@ -401,9 +469,8 @@ export default function App() {
               <MenuItem onClick={handleRedirectToProfilePage} component={Link} to={'/profile/' + currentUser}>
                 Profile
               </MenuItem>
-              {localStorage.getItem('user') !== undefined && localStorage.getItem('user') !== '' && (
-                <MenuItem onClick={handleDeleteAccount}>Delete Account</MenuItem>
-              )}
+              <MenuItem onClick={handleDeleteAccount}>Delete Account</MenuItem>
+              <MenuItem onClick={handleChangePassword}>Change Password</MenuItem>
               <MenuItem onClick={handleLogout} component={Link} to='/'>
                 Logout
               </MenuItem>
@@ -415,6 +482,13 @@ export default function App() {
             exact
             path='/login'
             component={() => <Login setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />}
+          />
+          <Route
+            exact
+            path='/changePassword'
+            component={() => (
+              <ChangePassword setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />
+            )}
           />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route

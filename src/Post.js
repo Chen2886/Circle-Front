@@ -98,6 +98,21 @@ export default function Post(props) {
   const [alertSeverity, setAlertSeverity] = React.useState('error');
   const [savedPost, setSavedPost] = React.useState([]);
 
+  const updateComments = async () => {
+    try {
+      axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/listComments',
+          {
+            params: { object_id: props.post._id.$oid },
+          },
+          headers
+        )
+        .then((res) => setComments(res.data))
+        .catch((err) => setComments([]));
+    } catch (err) {}
+  };
+
   useEffect(() => {
     if (props.post.votes !== undefined) setVotes(props.post.votes);
     updateComments();
@@ -109,7 +124,7 @@ export default function Post(props) {
       setLoggedIn(true);
       updateSavedPost();
     }
-  }, [props]);
+  }, [props, updateComments]);
 
   useEffect(() => {
     savedPost.forEach((post) => {
@@ -137,21 +152,6 @@ export default function Post(props) {
         )
         .then((res) => setSavedPost(res.data))
         .catch((err) => {});
-    } catch (err) {}
-  };
-
-  const updateComments = async () => {
-    try {
-      axios
-        .get(
-          'https://cs307circle-production.herokuapp.com/api/listComments',
-          {
-            params: { object_id: props.post._id.$oid },
-          },
-          headers
-        )
-        .then((res) => setComments(res.data))
-        .catch((err) => setComments([]));
     } catch (err) {}
   };
 

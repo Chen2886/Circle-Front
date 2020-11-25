@@ -34,12 +34,8 @@ export default function Timeline(props) {
   };
 
   useEffect(() => {
-    if (filter === props.filter || posts.length > 0) {
-      return;
-    }
-    if (filter !== props.filter) {
-      setfilter(props.filter);
-    }
+    if (filter === props.filter || posts.length > 0) return;
+    if (filter !== props.filter) setfilter(props.filter);
 
     console.log('loading new posts.');
 
