@@ -122,11 +122,12 @@ export default function Post(props) {
       setDisableUpvote(true);
     } else {
       setLoggedIn(true);
-      updateSavedPost();
+      getSavedPosts();
     }
-  }, [props, updateComments]);
+  }, []);
 
   useEffect(() => {
+    if (savedPost.length <= 0) return;
     savedPost.forEach((post) => {
       if (post._id.$oid === props.post._id.$oid) setSaved(true);
     });
@@ -140,19 +141,22 @@ export default function Post(props) {
     history.push('/topic/' + props.post.topic);
   };
 
+  const getSavedPosts = () => {
+    var savedPosts = JSON.parse(localStorage.getItem('savedPosts'));
+    setSavedPost(savedPosts);
+  };
+
   const updateSavedPost = async () => {
-    try {
-      await axios
-        .get(
-          'https://cs307circle-production.herokuapp.com/api/listSavedPosts',
-          {
-            params: { username: localStorage.getItem('user') },
-          },
-          headers
-        )
-        .then((res) => setSavedPost(res.data))
-        .catch((err) => {});
-    } catch (err) {}
+    await axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/listSavedPosts',
+        {
+          params: { username: localStorage.getItem('user') },
+        },
+        headers
+      )
+      .then((res) => setSavedPost(res.data))
+      .catch((err) => {});
   };
 
   const upvote = async () => {

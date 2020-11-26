@@ -33,72 +33,97 @@ export default function Timeline(props) {
     setAlertOpen(false);
   };
 
+  const setSavedPosts = async () => {
+    await axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/listSavedPosts',
+        {
+          params: { username: localStorage.getItem('user') },
+        },
+        headers
+      )
+      .then(function (res) {
+        var sortedPosts = res.data.sort((a, b) => b.dateAndTime.$date - a.dateAndTime.$date);
+        localStorage.setItem('savedPosts', JSON.stringify(sortedPosts));
+      })
+      .catch(() => localStorage.setItem('savedPosts', []));
+  };
+
+  const getSavedPostsTimeline = () => {
+    var data = { username: props.savedPost };
+    axios
+      .get('https://cs307circle-production.herokuapp.com/api/listSavedPosts', { params: data }, headers)
+      .then(function (res) {
+        var sortedPosts = res.data.sort(function (a, b) {
+          return b.dateAndTime.$date - a.dateAndTime.$date;
+        });
+        localStorage.setItem('savedPosts', sortedPosts);
+        setPosts(sortedPosts);
+        setNumOfPosts(sortedPosts.length);
+        if (sortedPosts.length === 0) setHasMore(false);
+      })
+      .catch(function (err) {
+        localStorage.setItem('savedPosts', []);
+        setAlertOpen(true);
+        setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
+        setHasMore(false);
+      });
+    setLoading(false);
+  };
+
+  const updateTimeline = () => {
+    var data = { username: props.timeline };
+    axios
+      .get('https://cs307circle-production.herokuapp.com/api/getUserTimeline', { params: data }, headers)
+      .then(function (res) {
+        var sortedPosts = res.data.sort(function (a, b) {
+          return b.dateAndTime.$date - a.dateAndTime.$date;
+        });
+        if (props.filter !== undefined || props.filter !== null) {
+          var filter = [];
+          for (const [key, value] of Object.entries(props.filter)) {
+            if (value === 'outlined') filter.push(key);
+          }
+          sortedPosts = sortedPosts.filter((post) => {
+            return !filter.includes(post.topic) || post.author === localStorage.getItem('user');
+          });
+        }
+
+        setPosts(sortedPosts);
+        setNumOfPosts(sortedPosts.length);
+        if (sortedPosts.length === 0) setHasMore(false);
+      })
+      .catch(function (err) {
+        if (
+          err.response !== undefined &&
+          err.response.data === 'This user has not made any posts, does not follow anyone, and does not follow any topics.'
+        ) {
+          setHasMore(false);
+          return;
+        }
+        setAlertOpen(true);
+        setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
+        setHasMore(false);
+      });
+    setLoading(false);
+  };
+
   useEffect(() => {
+    setSavedPosts();
     if (filter === props.filter || posts.length > 0) return;
     if (filter !== props.filter) setfilter(props.filter);
-
-    console.log('loading new posts.');
 
     setLoading(true);
     var data = {};
 
     // user's customize timeline
     if (props.timeline !== undefined && props.timeline !== null) {
-      data = { username: props.timeline };
-      axios
-        .get('https://cs307circle-production.herokuapp.com/api/getUserTimeline', { params: data }, headers)
-        .then(function (res) {
-          var sortedPosts = res.data.sort(function (a, b) {
-            return b.dateAndTime.$date - a.dateAndTime.$date;
-          });
-          if (props.filter !== undefined || props.filter !== null) {
-            var filter = [];
-            for (const [key, value] of Object.entries(props.filter)) {
-              if (value === 'outlined') filter.push(key);
-            }
-            sortedPosts = sortedPosts.filter((post) => {
-              return !filter.includes(post.topic) || post.author === localStorage.getItem('user');
-            });
-          }
-
-          setPosts(sortedPosts);
-          setNumOfPosts(sortedPosts.length);
-          if (sortedPosts.length === 0) setHasMore(false);
-        })
-        .catch(function (err) {
-          if (
-            err.response !== undefined &&
-            err.response.data === 'This user has not made any posts, does not follow anyone, and does not follow any topics.'
-          ) {
-            setHasMore(false);
-            return;
-          }
-          setAlertOpen(true);
-          setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
-          setHasMore(false);
-        });
-      setLoading(false);
+      updateTimeline();
       return;
     }
 
     if (props.savedPost !== undefined && props.savedPost !== null) {
-      data = { username: props.savedPost };
-      axios
-        .get('https://cs307circle-production.herokuapp.com/api/listSavedPosts', { params: data }, headers)
-        .then(function (res) {
-          var sortedPosts = res.data.sort(function (a, b) {
-            return b.dateAndTime.$date - a.dateAndTime.$date;
-          });
-          setPosts(sortedPosts);
-          setNumOfPosts(sortedPosts.length);
-          if (sortedPosts.length === 0) setHasMore(false);
-        })
-        .catch(function (err) {
-          setAlertOpen(true);
-          setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
-          setHasMore(false);
-        });
-      setLoading(false);
+      getSavedPostsTimeline();
       return;
     }
 
@@ -143,7 +168,7 @@ export default function Timeline(props) {
         setHasMore(false);
       });
     setLoading(false);
-  }, [props]);
+  }, []);
 
   const fetchMoreData = () => {
     setHasMore(false);

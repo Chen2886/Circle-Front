@@ -289,18 +289,14 @@ export default function App() {
   const handleChangePasswordNew = (e) => setChangePasswordNew(e.target.value);
 
   const handleConfirmChangePasswordDialog = () => {
-    console.log(changePasswordNew);
-    console.log(changePasswordOld);
     if (currentUser === null || currentUser === undefined || currentUser === '') return;
+    var data = { username: currentUser, oldpass: sha256(changePasswordOld), newpass: sha256(changePasswordNew) };
     axios
-      .delete(
-        'https://cs307circle-production.herokuapp.com/api/changePassword',
-        {
-          params: { username: currentUser, oldpass: sha256(changePasswordOld), newpass: sha256(changePasswordNew) },
-        },
-        headers
-      )
-      .then((res) => handleLogout())
+      .post('https://cs307circle-production.herokuapp.com/api/changePassword', data, headers)
+      .then((res) => {
+        setChangePasswordDialogOpen(false);
+        handleLogout();
+      })
       .catch((err) => console.log(err));
     setDeleteDialogOpen(false);
   };
@@ -477,6 +473,7 @@ export default function App() {
             </Menu>
           </div>
         </div>
+        {/* <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} /> */}
         <Switch>
           <Route
             exact
