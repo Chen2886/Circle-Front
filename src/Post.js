@@ -163,6 +163,7 @@ export default function Post(props) {
     var data = {
       object_id: props.post._id.$oid,
       votes: 1,
+      username: localStorage.getItem('user'),
     };
     if (disableDownvote === false) {
       await axios.put('https://cs307circle-production.herokuapp.com/api/updatePostVotes', data, headers);
@@ -180,9 +181,12 @@ export default function Post(props) {
     var data = {
       object_id: props.post._id.$oid,
       votes: -1,
+      username: localStorage.getItem('user'),
     };
     if (disableUpvote === false) {
-      await axios.put('https://cs307circle-production.herokuapp.com/api/updatePostVotes', data, headers);
+      await axios.put('https://cs307circle-production.herokuapp.com/api/updatePostVotes', data, headers).catch(function (err) {
+        console.log(err.response);
+      });
       setVotes(votes - 1);
     } else {
       await axios.put('https://cs307circle-production.herokuapp.com/api/updatePostVotes', data, headers);
