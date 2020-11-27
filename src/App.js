@@ -2,7 +2,7 @@ import './App.css';
 import logo from './resources/logo.png';
 import React, { useEffect } from 'react';
 
-import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
+import { HashRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import axios from 'axios';
 import sha256 from 'js-sha256';
@@ -473,7 +473,6 @@ export default function App() {
             </Menu>
           </div>
         </div>
-        {/* <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} /> */}
         <Switch>
           <Route
             exact
