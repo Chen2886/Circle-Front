@@ -486,7 +486,6 @@ export default function App() {
               <ChangePassword setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} setIsLoggedIn={setIsLoggedIn} />
             )}
           />
-          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
           <Route
             exact
             path='/createPost'
@@ -518,6 +517,7 @@ export default function App() {
             component={() => <UserLine setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
           <Route exact path='/404' component={() => <Page404></Page404>} />
+          <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />
         </Switch>
       </Router>
     </ThemeProvider>
