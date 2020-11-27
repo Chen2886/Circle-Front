@@ -46,7 +46,7 @@ export default function Timeline(props) {
         var sortedPosts = res.data.sort((a, b) => b.dateAndTime.$date - a.dateAndTime.$date);
         localStorage.setItem('savedPosts', JSON.stringify(sortedPosts));
       })
-      .catch(() => localStorage.setItem('savedPosts', []));
+      .catch(() => localStorage.setItem('savedPosts', JSON.stringify([])));
   };
 
   const getSavedPostsTimeline = () => {
@@ -57,13 +57,13 @@ export default function Timeline(props) {
         var sortedPosts = res.data.sort(function (a, b) {
           return b.dateAndTime.$date - a.dateAndTime.$date;
         });
-        localStorage.setItem('savedPosts', sortedPosts);
+        localStorage.setItem('savedPosts', JSON.stringify(sortedPosts));
         setPosts(sortedPosts);
         setNumOfPosts(sortedPosts.length);
         if (sortedPosts.length === 0) setHasMore(false);
       })
       .catch(function (err) {
-        localStorage.setItem('savedPosts', []);
+        localStorage.setItem('savedPosts', JSON.stringify([]))
         setAlertOpen(true);
         setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
         setHasMore(false);
