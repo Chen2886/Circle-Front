@@ -1,7 +1,7 @@
 import './App.css';
 import Timeline from './Timeline.js';
 import React, { useEffect } from 'react';
-import { Fab, Card, Divider, Typography, Chip, Avatar, Grid } from '@material-ui/core';
+import { Fab, Card, Divider, Typography, Chip, Avatar, Grid, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/core/styles';
 import PeopleIcon from '@material-ui/icons/People';
@@ -43,6 +43,12 @@ export default function Main(props) {
   const [circles, setCircles] = React.useState([]);
   const [chipDict, setChipDict] = React.useState({});
   const [update, setUpdate] = React.useState(false);
+  const [radioValue, setRadioValue] = React.useState('Default');
+
+  const handleRadioChange = (event) => {
+    setRadioValue(event.target.value);
+  };
+
   useEffect(() => {
     function setAppBar() {
       props.setShowSearchField(true);
@@ -94,7 +100,7 @@ export default function Main(props) {
       </Fab>
       {circles != null && (
         <Grid container alignItems='center' justify='center'>
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={4}>
             <Card className={classes.infoCard}>
               <Divider variant='middle' />
               <Typography variant='h6' className={classes.infoTitle}>
@@ -123,9 +129,27 @@ export default function Main(props) {
               </div>
             </Card>
           </Grid>
+          <Grid item xs={12} md={4}>
+            <Card className={classes.infoCard}>
+              <Divider variant='middle' />
+              <Typography variant='h6' className={classes.infoTitle}>
+                Sorting Options
+              </Typography>
+              <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                <FormControl component='fieldset'>
+                  <RadioGroup value={radioValue} onChange={handleRadioChange}>
+                    <FormControlLabel value='Default' control={<Radio color='primary' />} label='Default' />
+                    <FormControlLabel value='Engagement' control={<Radio color='primary' />} label='Engagement' />
+                    <FormControlLabel value='male' control={<Radio color='primary' />} label='Male' />
+                    <FormControlLabel value='other' control={<Radio color='primary' />} label='Other' />
+                  </RadioGroup>
+                </FormControl>
+              </div>
+            </Card>
+          </Grid>
         </Grid>
       )}
-      <Timeline timeline={localStorage.getItem('user')} filter={chipDict}></Timeline>
+      <Timeline timeline={localStorage.getItem('user')} filter={chipDict} sort={radioValue}></Timeline>
     </>
   );
 }

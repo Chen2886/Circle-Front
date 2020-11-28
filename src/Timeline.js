@@ -63,7 +63,7 @@ export default function Timeline(props) {
         if (sortedPosts.length === 0) setHasMore(false);
       })
       .catch(function (err) {
-        localStorage.setItem('savedPosts', JSON.stringify([]))
+        localStorage.setItem('savedPosts', JSON.stringify([]));
         setAlertOpen(true);
         setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
         setHasMore(false);
@@ -72,13 +72,23 @@ export default function Timeline(props) {
   };
 
   const updateTimeline = () => {
-    var data = { username: props.timeline };
+    console.log(props);
+    var data = {};
+    if (props.sort === 'Default') {
+      data = { username: props.timeline };
+    } else {
+      data = { username: props.timeline, sort: props.sort.toLowerCase() };
+    }
+
     axios
       .get('https://cs307circle-production.herokuapp.com/api/getUserTimeline', { params: data }, headers)
       .then(function (res) {
-        var sortedPosts = res.data.sort(function (a, b) {
-          return b.dateAndTime.$date - a.dateAndTime.$date;
-        });
+        var sortedPosts;
+        if (props.sort === 'Default') {
+          sortedPosts = res.data.sort((a, b) => b.dateAndTime.$date - a.dateAndTime.$date);
+        } else {
+          sortedPosts = res.data;
+        }
         if (props.filter !== undefined || props.filter !== null) {
           var filter = [];
           for (const [key, value] of Object.entries(props.filter)) {
@@ -88,7 +98,6 @@ export default function Timeline(props) {
             return !filter.includes(post.topic) || post.author === localStorage.getItem('user');
           });
         }
-
         setPosts(sortedPosts);
         setNumOfPosts(sortedPosts.length);
         if (sortedPosts.length === 0) setHasMore(false);
@@ -110,8 +119,6 @@ export default function Timeline(props) {
 
   useEffect(() => {
     setSavedPosts();
-    if (filter === props.filter || posts.length > 0) return;
-    if (filter !== props.filter) setfilter(props.filter);
 
     setLoading(true);
     var data = {};
@@ -148,7 +155,7 @@ export default function Timeline(props) {
       return;
     }
 
-    // regular timeline
+    // topic or user timeline
     if (props.user !== undefined && props.user !== null) data = { author: props.user };
     else if (props.topic !== undefined && props.topic !== null) data = { topic: props.topic };
 
@@ -168,7 +175,7 @@ export default function Timeline(props) {
         setHasMore(false);
       });
     setLoading(false);
-  }, []);
+  }, [props]);
 
   const fetchMoreData = () => {
     setHasMore(false);
