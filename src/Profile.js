@@ -17,6 +17,10 @@ import {
   CircularProgress,
   CardHeader,
   IconButton,
+  FormControl,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
 } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import EditIcon from '@material-ui/icons/Edit';
@@ -155,6 +159,16 @@ export default function Profile(props) {
   const [currentUserFollowRequestedUser, setCurrentUserFollowRequestedUser] = React.useState(false);
   const [followButtonMessage, setFollowButtonMessage] = React.useState('');
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const [followingSortingRadioValue, setFollowingSortingRadioValue] = React.useState('Default');
+  const [followerSortingRadioValue, setFollowerSortingRadioValue] = React.useState('Default');
+
+  useEffect(() => {
+    console.log('updating following');
+  }, [listOfFollowing]);
+
+  useEffect(() => {
+    console.log('updating follower');
+  }, [listOfFollowers]);
 
   // if url does not include requested user
   if (requestedUser === null || requestedUser === '' || requestedUser === undefined) {
@@ -182,6 +196,24 @@ export default function Profile(props) {
   useEffect(() => {
     checkFollowing();
   }, [currentListOfFollowing]);
+
+  const handleSortingFollowingRadioChange = async (event) => {
+    setFollowingSortingRadioValue(event.target.value);
+    if (followingSortingRadioValue === 'Default') {
+      await updateListOfFollowing(currentUser, setListOfFollowing);
+    } else if (followingSortingRadioValue === 'Interaction') {
+      await updateListOfFollowingInteractions();
+    }
+  };
+
+  const handleSortingFollowerRadioChange = async (event) => {
+    setFollowerSortingRadioValue(event.target.value);
+    if (followerSortingRadioValue === 'Default') {
+      await updateListOfFollowers(currentUser, setListOfFollowers);
+    } else if (followerSortingRadioValue === 'Interaction') {
+      await updateListOfFollowerInteractions();
+    }
+  };
 
   const editUserInfo = async () => {
     if (editingUserInfo) {
@@ -330,6 +362,36 @@ export default function Profile(props) {
       await axios
         .get(
           'https://cs307circle-production.herokuapp.com/api/listFollowing',
+          {
+            params: { username: username },
+          },
+          headers
+        )
+        .then((res) => f(res.data))
+        .catch((err) => f([]));
+    } catch (err) {}
+  };
+
+  const updateListOfFollowingInteractions = async (username, f) => {
+    try {
+      await axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/getSortedInteractionFollowing',
+          {
+            params: { username: username },
+          },
+          headers
+        )
+        .then((res) => f(res.data))
+        .catch((err) => f([]));
+    } catch (err) {}
+  };
+
+  const updateListOfFollowerInteractions = async (username, f) => {
+    try {
+      await axios
+        .get(
+          'https://cs307circle-production.herokuapp.com/api/getSortedInteractionFollower',
           {
             params: { username: username },
           },
@@ -543,25 +605,42 @@ export default function Profile(props) {
                     <Typography variant='h6' className={classes.infoTitle}>
                       Following
                     </Typography>
+                    {requestedUser === currentUser && (
+                      <Card className={classes.infoCard}>
+                        <Typography variant='h6' className={classes.infoTitle}>
+                          Sorting Options
+                        </Typography>
+                        <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                          <FormControl component='fieldset'>
+                            <RadioGroup value={followingSortingRadioValue} onChange={handleSortingFollowingRadioChange}>
+                              <FormControlLabel value='Default' control={<Radio color='primary' />} label='Default' />
+                              <FormControlLabel value='Interaction' control={<Radio color='primary' />} label='Interaction' />
+                            </RadioGroup>
+                          </FormControl>
+                        </div>
+                      </Card>
+                    )}
                     <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
                       <div className={classes.followedCircles}>
                         {(listOfFollowing === undefined || listOfFollowing.length === 0) && <Typography variant='h5'>No followings</Typography>}
-                        {listOfFollowing !== undefined &&
-                          listOfFollowing.length !== 0 &&
-                          listOfFollowing.map((following) => (
-                            <Chip
-                              classes={{
-                                label: classes.chipLabel,
-                              }}
-                              variant='outlined'
-                              avatar={<Avatar>{following.username.charAt(0).toUpperCase()}</Avatar>}
-                              size='medium'
-                              color='primary'
-                              label={following.username}
-                              key={following.username}
-                              onClick={() => userClicked(following.username)}
-                            />
-                          ))}
+                        {listOfFollowing !== undefined && listOfFollowing.length !== 0 && (
+                          <>
+                            {listOfFollowing.map((following) => (
+                              <Chip
+                                classes={{
+                                  label: classes.chipLabel,
+                                }}
+                                variant='outlined'
+                                avatar={<Avatar>{following.username.charAt(0).toUpperCase()}</Avatar>}
+                                size='medium'
+                                color='primary'
+                                label={following.username}
+                                key={following.username}
+                                onClick={() => userClicked(following.username)}
+                              />
+                            ))}
+                          </>
+                        )}
                       </div>
                     </div>
                   </Card>
@@ -572,6 +651,21 @@ export default function Profile(props) {
                     <Typography variant='h6' className={classes.infoTitle}>
                       Follower
                     </Typography>
+                    {requestedUser === currentUser && (
+                      <Card className={classes.infoCard}>
+                        <Typography variant='h6' className={classes.infoTitle}>
+                          Sorting Options
+                        </Typography>
+                        <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                          <FormControl component='fieldset'>
+                            <RadioGroup value={followerSortingRadioValue} onChange={handleSortingFollowerRadioChange}>
+                              <FormControlLabel value='Default' control={<Radio color='primary' />} label='Default' />
+                              <FormControlLabel value='Interaction' control={<Radio color='primary' />} label='Interaction' />
+                            </RadioGroup>
+                          </FormControl>
+                        </div>
+                      </Card>
+                    )}
                     <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
                       <div className={classes.followedCircles}>
                         {(listOfFollowers === undefined || listOfFollowers.length === 0) && <Typography variant='h5'>No Followers</Typography>}

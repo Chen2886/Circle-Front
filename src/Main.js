@@ -140,7 +140,7 @@ export default function Main(props) {
                   <RadioGroup value={radioValue} onChange={handleRadioChange}>
                     <FormControlLabel value='Default' control={<Radio color='primary' />} label='Default' />
                     <FormControlLabel value='Engagement' control={<Radio color='primary' />} label='Engagement' />
-                    <FormControlLabel value='male' control={<Radio color='primary' />} label='Male' />
+                    <FormControlLabel value='Interaction' control={<Radio color='primary' />} label='Interaction' />
                     <FormControlLabel value='other' control={<Radio color='primary' />} label='Other' />
                   </RadioGroup>
                 </FormControl>
