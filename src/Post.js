@@ -14,6 +14,8 @@ import {
   InputLabel,
   FormControl,
   Snackbar,
+  Grid,
+  Backdrop
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
@@ -50,6 +52,16 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     backgroundColor: red[500],
+  },
+  img: {
+    marginTop: '1rem',
+    maxHeight: '30rem',
+    objectFit: 'contain',
+    maxWidth: '100%',
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
   },
 }));
 
@@ -97,6 +109,12 @@ export default function Post(props) {
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [alertSeverity, setAlertSeverity] = React.useState('error');
   const [savedPost, setSavedPost] = React.useState([]);
+  const [files, setFiles] = React.useState([]);
+  const [openPreview, setOpenPreview] = React.useState(false);
+  const [imgSrc, setImgSrc] = React.useState();
+
+  const handleClickOpenPreview = () => setOpenPreview(true);
+  const handleClosePreview = () => setOpenPreview(false);
 
   const updateComments = async () => {
     axios
@@ -115,8 +133,29 @@ export default function Post(props) {
       });
   };
 
+  const filePreview = (
+    <Grid container direction='row' justify='center' alignItems='center' spacing={2} style={{ width: '100%' }}>
+      {files.map((file, index) => {
+        return (
+          <Grid item xs={files.length - index - 1 < files.length % 3 ? 12 / (files.length % 3) : 4} key={index}>
+            <img
+              src={file}
+              alt='uploaded file'
+              className={classes.img}
+              onClick={() => {
+                setImgSrc(file);
+                handleClickOpenPreview();
+              }}
+            />
+          </Grid>
+        );
+      })}
+    </Grid>
+  );
+
   useEffect(() => {
-    // console.log(props.post);
+    console.log(props.post);
+    setFiles(props.post.image_data);
     if (props.post.votes !== undefined) setVotes(props.post.votes);
     updateComments();
     if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '') {
@@ -266,6 +305,9 @@ export default function Post(props) {
           {alertMessage}
         </Alert>
       </Snackbar>
+      <Backdrop open={openPreview} onClick={handleClosePreview} className={classes.backdrop}>
+        <img src={imgSrc} className={classes.previewImg} />
+      </Backdrop>
       <Card className={classes.root}>
         <CardHeader
           avatar={
@@ -291,6 +333,7 @@ export default function Post(props) {
         <Divider />
         <CardContent>
           <Typography variant='h4'>{props.post.title}</Typography>
+          {files.length > 0 && filePreview}
           <Typography variant='body1' style={{ marginTop: '1rem' }}>
             {props.post.text}
           </Typography>

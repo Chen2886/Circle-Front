@@ -98,8 +98,8 @@ export default function Main(props) {
       <Fab color='primary' aria-label='My Circles' component={Link} to='/myCircle'>
         <RadioButtonUncheckedIcon />
       </Fab>
-      {circles != null && (
-        <Grid container alignItems='center' justify='center'>
+      <Grid container alignItems='center' justify='center'>
+        {circles != null && (
           <Grid item xs={12} md={4}>
             <Card className={classes.infoCard}>
               <Divider variant='middle' />
@@ -129,9 +129,7 @@ export default function Main(props) {
               </div>
             </Card>
           </Grid>
-        </Grid>
-      )}
-      <Grid container alignItems='center' justify='center'>
+        )}
         <Grid item xs={12} md={4}>
           <Card className={classes.infoCard}>
             <Divider variant='middle' />
@@ -149,7 +147,6 @@ export default function Main(props) {
           </Card>
         </Grid>
       </Grid>
-
       <Timeline timeline={localStorage.getItem('user')} filter={chipDict} sort={radioValue}></Timeline>
     </>
   );
