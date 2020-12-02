@@ -77,6 +77,7 @@ export default function Timeline(props) {
       data = { username: props.timeline };
     } else if (props.sort === 'Engagement') {
       data = { username: props.timeline, sort: props.sort.toLowerCase() };
+      console.log(data);
     }
 
     axios
@@ -87,6 +88,7 @@ export default function Timeline(props) {
           sortedPosts = res.data.sort((a, b) => b.dateAndTime.$date - a.dateAndTime.$date);
         } else {
           sortedPosts = res.data;
+          console.log(sortedPosts);
         }
         if (props.filter !== undefined || props.filter !== null) {
           var filter = [];

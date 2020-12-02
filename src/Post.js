@@ -99,22 +99,24 @@ export default function Post(props) {
   const [savedPost, setSavedPost] = React.useState([]);
 
   const updateComments = async () => {
-    try {
-      axios
-        .get(
-          'https://cs307circle-production.herokuapp.com/api/listComments',
-          {
-            params: { object_id: props.post._id.$oid },
-          },
-          headers
-        )
-        .then((res) => setComments(res.data))
-        .catch((err) => setComments([]));
-    } catch (err) {}
+    axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/listComments',
+        {
+          params: { object_id: props.post._id.$oid },
+        },
+        headers
+      )
+      .then((res) => {
+        setComments(res.data);
+      })
+      .catch((err) => {
+        setComments([]);
+      });
   };
 
   useEffect(() => {
-    console.log(props.post);
+    // console.log(props.post);
     if (props.post.votes !== undefined) setVotes(props.post.votes);
     updateComments();
     if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '') {
@@ -125,7 +127,7 @@ export default function Post(props) {
       setLoggedIn(true);
       getSavedPosts();
     }
-  }, []);
+  }, [props]);
 
   useEffect(() => {
     if (savedPost.length <= 0) return;
