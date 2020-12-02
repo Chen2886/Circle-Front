@@ -264,11 +264,6 @@ export default function Login(props) {
           </Button>
         </div>
         <div className={classes.container}>
-          <Link to='/forgotPassword' className={classes.forgotPassword}>
-            <div>Forgot Password?</div>
-          </Link>
-        </div>
-        <div className={classes.container}>
           <Link to='/createAccount' className={classes.forgotPassword}>
             <div>New to CIRCLE? Create Account</div>
           </Link>

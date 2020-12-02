@@ -92,10 +92,10 @@ export default function Main(props) {
       <Fab color='primary' aria-label='New Post' component={Link} to='/CreatePost'>
         <EditIcon />
       </Fab>
-      <Fab color='primary' aria-label='My Friends' component={Link} to='/myFriends'>
+      <Fab color='primary' aria-label='My Friends' component={Link} to={'/profile/' + localStorage.getItem('user')}>
         <PeopleIcon />
       </Fab>
-      <Fab color='primary' aria-label='My Circles' component={Link} to='/myCircle'>
+      <Fab color='primary' aria-label='My Circles' component={Link} to={'/profile/' + localStorage.getItem('user')}>
         <RadioButtonUncheckedIcon />
       </Fab>
       <Grid container alignItems='center' justify='center'>
