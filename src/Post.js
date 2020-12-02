@@ -114,6 +114,7 @@ export default function Post(props) {
   };
 
   useEffect(() => {
+    console.log(props.post);
     if (props.post.votes !== undefined) setVotes(props.post.votes);
     updateComments();
     if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '') {

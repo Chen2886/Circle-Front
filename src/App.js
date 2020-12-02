@@ -47,6 +47,7 @@ import Alert from './Alert.js';
 import SavedPost from './SavedPost.js';
 import UserLine from './UserLine.js';
 import ChangePassword from './ChangePassword.js';
+import Interacted from './Interacted.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -297,7 +298,10 @@ export default function App() {
         setChangePasswordDialogOpen(false);
         handleLogout();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setAlertMessage('Change password error.');
+        setAlertOpen(true);
+      });
     setDeleteDialogOpen(false);
   };
 
@@ -392,12 +396,21 @@ export default function App() {
                                 <ListItem button key='New Post' component={Link} to='/CreatePost'>
                                   <ListItemText primary='New Post' />
                                 </ListItem>
-                                <ListItem button key='Saved Post' component={Link} to='/savedPost'>
-                                  <ListItemText primary='Saved Post' />
-                                </ListItem>
-                                <ListItem button key='User Line' component={Link} to='/userLine'>
-                                  <ListItemText primary='User Line' />
-                                </ListItem>
+                                {currentUser !== null && currentUser !== '' && (
+                                  <ListItem button key='Saved Post' component={Link} to='/savedPost'>
+                                    <ListItemText primary='Saved Post' />
+                                  </ListItem>
+                                )}
+                                {currentUser !== null && currentUser !== '' && (
+                                  <ListItem button key='User Line' component={Link} to='/userLine'>
+                                    <ListItemText primary='User Line' />
+                                  </ListItem>
+                                )}
+                                {currentUser !== null && currentUser !== '' && (
+                                  <ListItem button key='Interacted' component={Link} to='/interacted'>
+                                    <ListItemText primary='Interacted' />
+                                  </ListItem>
+                                )}
                               </List>
                             </Drawer>
                           </td>
@@ -515,6 +528,11 @@ export default function App() {
             exact
             path='/userLine'
             component={() => <UserLine setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
+          />
+          <Route
+            exact
+            path='/interacted'
+            component={() => <Interacted setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />}
           />
           <Route exact path='/404' component={() => <Page404></Page404>} />
           <Route exact path='/' component={() => <Main setShowSearchField={setShowSearchField} setShowLoginButton={setShowLoginButton} />} />

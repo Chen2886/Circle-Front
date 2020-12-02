@@ -72,11 +72,10 @@ export default function Timeline(props) {
   };
 
   const updateTimeline = () => {
-    console.log(props);
     var data = {};
     if (props.sort === 'Default') {
       data = { username: props.timeline };
-    } else {
+    } else if (props.sort === 'Engagement') {
       data = { username: props.timeline, sort: props.sort.toLowerCase() };
     }
 
@@ -117,6 +116,32 @@ export default function Timeline(props) {
     setLoading(false);
   };
 
+  const updateInteractedTimeline = () => {
+    var data = {username: props.usernameInteracted, order: props.interacted};
+
+    axios
+      .get('https://cs307circle-production.herokuapp.com/api/listInteractedPost', { params: data }, headers)
+      .then(function (res) {
+        var sortedPosts = res.data;
+        setPosts(sortedPosts);
+        setNumOfPosts(sortedPosts.length);
+        if (sortedPosts.length === 0) setHasMore(false);
+      })
+      .catch(function (err) {
+        if (
+          err.response !== undefined &&
+          err.response.data === 'This user has not made any posts, does not follow anyone, and does not follow any topics.'
+        ) {
+          setHasMore(false);
+          return;
+        }
+        setAlertOpen(true);
+        setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
+        setHasMore(false);
+      });
+    setLoading(false);
+  };
+
   useEffect(() => {
     setSavedPosts();
 
@@ -131,6 +156,11 @@ export default function Timeline(props) {
 
     if (props.savedPost !== undefined && props.savedPost !== null) {
       getSavedPostsTimeline();
+      return;
+    }
+
+    if (props.interacted !== undefined && props.interacted !== null) {
+      updateInteractedTimeline();
       return;
     }
 

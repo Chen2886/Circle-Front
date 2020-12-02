@@ -38,12 +38,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Main(props) {
+export default function Interacted(props) {
   const classes = useStyles();
   const [circles, setCircles] = React.useState([]);
   const [chipDict, setChipDict] = React.useState({});
   const [update, setUpdate] = React.useState(false);
-  const [radioValue, setRadioValue] = React.useState('Default');
+  const [radioValue, setRadioValue] = React.useState('descend');
 
   const handleRadioChange = (event) => {
     setRadioValue(event.target.value);
@@ -98,39 +98,6 @@ export default function Main(props) {
       <Fab color='primary' aria-label='My Circles' component={Link} to='/myCircle'>
         <RadioButtonUncheckedIcon />
       </Fab>
-      {circles != null && (
-        <Grid container alignItems='center' justify='center'>
-          <Grid item xs={12} md={4}>
-            <Card className={classes.infoCard}>
-              <Divider variant='middle' />
-              <Typography variant='h6' className={classes.infoTitle}>
-                Filter Circles
-              </Typography>
-              <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
-                <div className={classes.followedCircles}>
-                  {circles.length === 0 && <Typography variant='h5'>No CIRCLEs.</Typography>}
-                  {Object.keys(chipDict).length !== 0 &&
-                    Object.keys(chipDict).map((circle) => (
-                      <Chip
-                        classes={{
-                          label: classes.chipLabel,
-                        }}
-                        clickable
-                        variant={chipDict[circle]}
-                        avatar={<Avatar>{circle.charAt(0).toUpperCase()}</Avatar>}
-                        size='medium'
-                        color={update ? 'primary' : 'primary'}
-                        label={circle}
-                        key={circle}
-                        onClick={() => circleClicked(circle)}
-                      />
-                    ))}
-                </div>
-              </div>
-            </Card>
-          </Grid>
-        </Grid>
-      )}
       <Grid container alignItems='center' justify='center'>
         <Grid item xs={12} md={4}>
           <Card className={classes.infoCard}>
@@ -141,16 +108,15 @@ export default function Main(props) {
             <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
               <FormControl component='fieldset'>
                 <RadioGroup value={radioValue} onChange={handleRadioChange}>
-                  <FormControlLabel value='Default' control={<Radio color='primary' />} label='Default' />
-                  <FormControlLabel value='Engagement' control={<Radio color='primary' />} label='Engagement' />
+                  <FormControlLabel value='descend' control={<Radio color='primary' />} label='Interaction Descend' />
+                  <FormControlLabel value='ascend' control={<Radio color='primary' />} label='Interaction Ascend' />
                 </RadioGroup>
               </FormControl>
             </div>
           </Card>
         </Grid>
       </Grid>
-
-      <Timeline timeline={localStorage.getItem('user')} filter={chipDict} sort={radioValue}></Timeline>
+      <Timeline interacted={radioValue} usernameInteracted={localStorage.getItem('user')}></Timeline>
     </>
   );
 }
