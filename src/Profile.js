@@ -156,19 +156,12 @@ export default function Profile(props) {
   const [currentCircles, setCurrentCircles] = React.useState([]);
   const [currentListOfFollowers, setCurrentListOfFollowers] = React.useState([]);
   const [currentListOfFollowing, setCurrentListOfFollowing] = React.useState([]);
+  const [potentialFollowing, setPotentialFollowing] = React.useState([]);
   const [currentUserFollowRequestedUser, setCurrentUserFollowRequestedUser] = React.useState(false);
   const [followButtonMessage, setFollowButtonMessage] = React.useState('');
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [followingSortingRadioValue, setFollowingSortingRadioValue] = React.useState('Default');
   const [followerSortingRadioValue, setFollowerSortingRadioValue] = React.useState('Default');
-
-  useEffect(() => {
-    // console.log('updating following');
-  }, [listOfFollowing]);
-
-  useEffect(() => {
-    // console.log('updating follower');
-  }, [listOfFollowers]);
 
   // if url does not include requested user
   if (requestedUser === null || requestedUser === '' || requestedUser === undefined) {
@@ -188,6 +181,7 @@ export default function Profile(props) {
     setAppBar();
     getRequestedUser(requestedUser);
     getcurrentUser(currentUser);
+    updateListOfPotentialFollowing();
     if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '')
       setLoggedIn(false);
     else setLoggedIn(true);
@@ -328,63 +322,69 @@ export default function Profile(props) {
   };
 
   const updateTopics = async (username, f) => {
-    try {
-      await axios
-        .get(
-          'https://cs307circle-production.herokuapp.com/api/getUserTopics',
-          {
-            params: { username: username },
-          },
-          headers
-        )
-        .then((res) => f(res.data))
-        .catch((err) => f([]));
-    } catch (err) {}
+    await axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/getUserTopics',
+        {
+          params: { username: username },
+        },
+        headers
+      )
+      .then((res) => f(res.data))
+      .catch((err) => f([]));
   };
 
   const updateListOfFollowers = async (username, f) => {
-    try {
-      await axios
-        .get(
-          'https://cs307circle-production.herokuapp.com/api/listFollowers',
-          {
-            params: { username: username },
-          },
-          headers
-        )
-        .then((res) => f(res.data))
-        .catch((err) => f([]));
-    } catch (err) {}
+    await axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/listFollowers',
+        {
+          params: { username: username },
+        },
+        headers
+      )
+      .then((res) => f(res.data))
+      .catch((err) => f([]));
   };
 
   const updateListOfFollowing = async (username, f) => {
-    try {
-      await axios
-        .get(
-          'https://cs307circle-production.herokuapp.com/api/listFollowing',
-          {
-            params: { username: username },
-          },
-          headers
-        )
-        .then((res) => f(res.data))
-        .catch((err) => f([]));
-    } catch (err) {}
+    await axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/listFollowing',
+        {
+          params: { username: username },
+        },
+        headers
+      )
+      .then((res) => f(res.data))
+      .catch((err) => f([]));
+  };
+
+  const updateListOfPotentialFollowing = async () => {
+    if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '') return;
+    await axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/getPotentialFollowing',
+        {
+          params: { username: localStorage.getItem('user') },
+        },
+        headers
+      )
+      .then((res) => setPotentialFollowing(res.data))
+      .catch((err) => setPotentialFollowing([]));
   };
 
   const updateListOfFollowingInteractions = async (username, f) => {
-    try {
-      await axios
-        .get(
-          'https://cs307circle-production.herokuapp.com/api/getSortedInteractionFollowing',
-          {
-            params: { username: username },
-          },
-          headers
-        )
-        .then((res) => f(res.data))
-        .catch((err) => f([]));
-    } catch (err) {}
+    await axios
+      .get(
+        'https://cs307circle-production.herokuapp.com/api/getSortedInteractionFollowing',
+        {
+          params: { username: username },
+        },
+        headers
+      )
+      .then((res) => f(res.data))
+      .catch((err) => f([]));
   };
 
   const updateListOfFollowerInteractions = async (username, f) => {
@@ -444,6 +444,7 @@ export default function Profile(props) {
     await updateListOfFollowers(currentUser, setCurrentListOfFollowers);
     await updateListOfFollowing(requestedUser, setListOfFollowing);
     await updateListOfFollowers(requestedUser, setListOfFollowers);
+    updateListOfPotentialFollowing();
   };
 
   const unfollowUser = async () => {
@@ -456,6 +457,7 @@ export default function Profile(props) {
     await updateListOfFollowers(currentUser, setCurrentListOfFollowers);
     await updateListOfFollowing(requestedUser, setListOfFollowing);
     await updateListOfFollowers(requestedUser, setListOfFollowers);
+    updateListOfPotentialFollowing();
   };
 
   const checkFollowing = () => {
@@ -687,6 +689,37 @@ export default function Profile(props) {
                   </Card>
                 </Grid>
               </Grid>
+              {currentUser === requestedUser && (
+                <Card className={classes.infoCard}>
+                  <Divider variant='middle' />
+                  <Typography variant='h6' className={classes.infoTitle}>
+                    Potential User to Follow
+                  </Typography>
+                  <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                    <div className={classes.followedCircles}>
+                      {potentialFollowing.length === 0 && <Typography variant='h5'>No CIRCLEs.</Typography>}
+                      {potentialFollowing.length !== 0 &&
+                        potentialFollowing.map((follower) => {
+                          if (follower.username === currentUser) return;
+                          return (
+                            <Chip
+                              classes={{
+                                label: classes.chipLabel,
+                              }}
+                              variant='outlined'
+                              avatar={<Avatar>{follower.username.charAt(0).toUpperCase()}</Avatar>}
+                              size='medium'
+                              color='primary'
+                              label={follower.username}
+                              key={follower.username}
+                              onClick={() => userClicked(follower.username)}
+                            />
+                          );
+                        })}
+                    </div>
+                  </div>
+                </Card>
+              )}
             </>
           )}
           <Timeline user={requestedUser}></Timeline>
