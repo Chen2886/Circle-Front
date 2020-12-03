@@ -487,9 +487,6 @@ export default function Profile(props) {
           <Grid container>
             <Grid item xs={12} md={requestedUser === currentUserObj.username ? 8 : 12}>
               <Card className={classes.avatarCard}>
-                <div className={classes.avatarContainer}>
-                  <img src='https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg' className={classes.avatar} alt='avatar' />
-                </div>
                 <div className={classes.infoContainer}>
                   <div className={classes.flexDisplay}>
                     <Typography variant='h4' style={{ float: 'left' }}>

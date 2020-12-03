@@ -180,7 +180,7 @@ export default function Timeline(props) {
         })
         .catch(function (err) {
           setAlertOpen(true);
-          setAlertMessage(err.response === null ? 'Error, please try again later' : err.response.data);
+          setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
           setHasMore(false);
         });
       setLoading(false);
