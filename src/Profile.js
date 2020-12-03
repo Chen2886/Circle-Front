@@ -163,16 +163,16 @@ export default function Profile(props) {
   const [followerSortingRadioValue, setFollowerSortingRadioValue] = React.useState('Default');
 
   useEffect(() => {
-    console.log('updating following');
+    // console.log('updating following');
   }, [listOfFollowing]);
 
   useEffect(() => {
-    console.log('updating follower');
+    // console.log('updating follower');
   }, [listOfFollowers]);
 
   // if url does not include requested user
   if (requestedUser === null || requestedUser === '' || requestedUser === undefined) {
-    console.log(requestedUser);
+    // console.log(requestedUser);
     history.push('/404');
   }
 

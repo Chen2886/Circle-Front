@@ -154,7 +154,7 @@ export default function Post(props) {
   );
 
   useEffect(() => {
-    console.log(props.post);
+    // console.log(props.post);
     setFiles(props.post.image_data);
     if (props.post.votes !== undefined) setVotes(props.post.votes);
     updateComments();
