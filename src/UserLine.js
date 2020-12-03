@@ -31,7 +31,7 @@ export default function SavedPost(props) {
           </Typography>
         </Grid>
       </Grid>
-      <Timeline user={localStorage.getItem('user')}></Timeline>
+      <Timeline userline={localStorage.getItem('user')}></Timeline>
     </>
   );
 }

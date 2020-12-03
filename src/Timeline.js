@@ -142,6 +142,32 @@ export default function Timeline(props) {
     setLoading(false);
   };
 
+  const updateUserline = () => {
+    var data = {username: props.userline};
+
+    axios
+      .get('https://cs307circle-production.herokuapp.com/api/listUserlineInteractedPost', { params: data }, headers)
+      .then(function (res) {
+        var sortedPosts = res.data;
+        setPosts(sortedPosts);
+        setNumOfPosts(sortedPosts.length);
+        if (sortedPosts.length === 0) setHasMore(false);
+      })
+      .catch(function (err) {
+        if (
+          err.response !== undefined &&
+          err.response.data === 'This user has not made any posts, does not follow anyone, and does not follow any topics.'
+        ) {
+          setHasMore(false);
+          return;
+        }
+        setAlertOpen(true);
+        setAlertMessage(err.response === undefined ? 'Error, please try again later' : err.response.data);
+        setHasMore(false);
+      });
+    setLoading(false);
+  };
+
   useEffect(() => {
     setSavedPosts();
 
@@ -161,6 +187,11 @@ export default function Timeline(props) {
 
     if (props.interacted !== undefined && props.interacted !== null) {
       updateInteractedTimeline();
+      return;
+    }
+
+    if (props.userline !== undefined && props.interacted !== null) {
+      updateUserline();
       return;
     }
 
