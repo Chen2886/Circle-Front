@@ -196,7 +196,7 @@ export default function Profile(props) {
     if (followingSortingRadioValue === 'Default') {
       await updateListOfFollowing(currentUser, setListOfFollowing);
     } else if (followingSortingRadioValue === 'Interaction') {
-      await updateListOfFollowingInteractions();
+      await updateListOfFollowingInteractions(currentUser, setListOfFollowing);
     }
   };
 
@@ -205,7 +205,7 @@ export default function Profile(props) {
     if (followerSortingRadioValue === 'Default') {
       await updateListOfFollowers(currentUser, setListOfFollowers);
     } else if (followerSortingRadioValue === 'Interaction') {
-      await updateListOfFollowerInteractions();
+      await updateListOfFollowerInteractions(currentUser, setListOfFollowers);
     }
   };
 
