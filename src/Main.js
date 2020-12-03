@@ -98,8 +98,9 @@ export default function Main(props) {
       <Fab color='primary' aria-label='My Circles' component={Link} to={'/profile/' + localStorage.getItem('user')}>
         <RadioButtonUncheckedIcon />
       </Fab>
-      <Grid container alignItems='center' justify='center'>
-        {circles != null && (
+
+      {circles != null && (
+        <Grid container alignItems='center' justify='center'>
           <Grid item xs={12} md={4}>
             <Card className={classes.infoCard}>
               <Divider variant='middle' />
@@ -129,25 +130,26 @@ export default function Main(props) {
               </div>
             </Card>
           </Grid>
-        )}
-        <Grid item xs={12} md={4}>
-          <Card className={classes.infoCard}>
-            <Divider variant='middle' />
-            <Typography variant='h6' className={classes.infoTitle}>
-              Sorting Options
-            </Typography>
-            <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
-              <FormControl component='fieldset'>
-                <RadioGroup value={radioValue} onChange={handleRadioChange}>
-                  <FormControlLabel value='Default' control={<Radio color='primary' />} label='Default' />
-                  <FormControlLabel value='Engagement' control={<Radio color='primary' />} label='Engagement' />
-                  <FormControlLabel value='Relevance' control={<Radio color='primary' />} label='Relevance' />
-                </RadioGroup>
-              </FormControl>
-            </div>
-          </Card>
+
+          <Grid item xs={12} md={4}>
+            <Card className={classes.infoCard}>
+              <Divider variant='middle' />
+              <Typography variant='h6' className={classes.infoTitle}>
+                Sorting Options
+              </Typography>
+              <div style={{ width: '75%', margin: '0 auto', marginBottom: '3rem' }}>
+                <FormControl component='fieldset'>
+                  <RadioGroup value={radioValue} onChange={handleRadioChange}>
+                    <FormControlLabel value='Default' control={<Radio color='primary' />} label='Default' />
+                    <FormControlLabel value='Engagement' control={<Radio color='primary' />} label='Engagement' />
+                    <FormControlLabel value='Relevance' control={<Radio color='primary' />} label='Relevance' />
+                  </RadioGroup>
+                </FormControl>
+              </div>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
       <Timeline timeline={localStorage.getItem('user')} filter={chipDict} sort={radioValue}></Timeline>
     </>
   );
