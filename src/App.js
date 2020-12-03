@@ -158,6 +158,7 @@ export default function App() {
   const [deleteAccountPassword, setDeleteAccountPassword] = React.useState('');
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
+  const [alertSeverity, setAlertSeverity] = React.useState('error');
   const [searchRedirect, setSearchRedirect] = React.useState(false);
   const [searchRedirectUrl, setSearchRedirectUrl] = React.useState('');
   const [searchValue, setSearchValue] = React.useState('');
@@ -247,6 +248,7 @@ export default function App() {
     if (event.key === 'Enter') {
       if (localStorage.getItem('user') === undefined || localStorage.getItem('user') === null || localStorage.getItem('user') === '') {
         setAlertMessage('You are not logged in!');
+        setAlertSeverity('error');
         setAlertOpen(true);
         return;
       }
@@ -274,6 +276,7 @@ export default function App() {
         return;
       } else {
         setAlertMessage('Neither a user or a topic has this name.');
+        setAlertSeverity('error');
         setAlertOpen(true);
       }
     }
@@ -297,9 +300,13 @@ export default function App() {
       .then((res) => {
         setChangePasswordDialogOpen(false);
         handleLogout();
+        setAlertMessage('Change password success.');
+        setAlertSeverity('success');
+        setAlertOpen(true);
       })
       .catch((err) => {
         setAlertMessage('Change password error.');
+        setAlertSeverity('error');
         setAlertOpen(true);
       });
     setDeleteDialogOpen(false);
@@ -308,7 +315,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={handleAlertClose} severity='error'>
+        <Alert onClose={handleAlertClose} severity={alertSeverity}>
           {alertMessage}
         </Alert>
       </Snackbar>
