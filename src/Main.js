@@ -59,6 +59,7 @@ export default function Main(props) {
   }, [props]);
 
   const updateTopics = async (username, f) => {
+    console.log(username)
     if (username === null || username === '' || username === undefined) {
       setCircles(null);
       return;
@@ -87,6 +88,8 @@ export default function Main(props) {
     setUpdate(!update);
   };
 
+  console.log(circles);
+
   return (
     <>
       <Fab color='primary' aria-label='New Post' component={Link} to='/CreatePost'>
@@ -99,7 +102,7 @@ export default function Main(props) {
         <RadioButtonUncheckedIcon />
       </Fab>
 
-      {circles != null && (
+      {circles !== undefined && circles !== null && localStorage.getItem('user') !== undefined && (
         <Grid container alignItems='center' justify='center'>
           <Grid item xs={12} md={4}>
             <Card className={classes.infoCard}>
@@ -130,7 +133,6 @@ export default function Main(props) {
               </div>
             </Card>
           </Grid>
-
           <Grid item xs={12} md={4}>
             <Card className={classes.infoCard}>
               <Divider variant='middle' />
