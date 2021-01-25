@@ -11,6 +11,9 @@ Created by Team 4
 #### Profile Page
 ![Profile Page](https://imgur.com/GNK0zpU.png)
 
+#### Create Account Page
+![Create Account Page](https://imgur.com/VG70CzN)
+
 ## Getting Started
 To deploy new changes to the Heroku frontend site:
 1. Clone frontend repository from git
