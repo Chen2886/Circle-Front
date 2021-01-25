@@ -1,5 +1,5 @@
-#CS 307 Project
-## Created by Team 4
+# CS 307 Project
+Created by Team 4
 
 ## Getting Started
 To deploy new changes to the Heroku frontend site:
