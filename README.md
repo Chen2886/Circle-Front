@@ -12,7 +12,7 @@ Created by Team 4
 ![Profile Page](https://imgur.com/GNK0zpU.png)
 
 #### Create Account Page
-![Create Account Page](https://imgur.com/VG70CzN)
+![Create Account Page](https://imgur.com/VG70CzN.png)
 
 ## Getting Started
 To deploy new changes to the Heroku frontend site:
