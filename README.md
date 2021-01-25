@@ -3,13 +3,13 @@ Created by Team 4
 
 ## Demo
 #### Home Page
-![Home Page]https://imgur.com/8mj0JIM.png
+![Home Page](https://imgur.com/8mj0JIM.png)
 
 #### Login Page
-![Login Page]https://imgur.com/nM1Lj3I.png
+![Login Page](https://imgur.com/nM1Lj3I.png)
 
 #### Profile Page
-![Profile Page]https://imgur.com/GNK0zpU.png
+![Profile Page](https://imgur.com/GNK0zpU.png)
 
 ## Getting Started
 To deploy new changes to the Heroku frontend site:
